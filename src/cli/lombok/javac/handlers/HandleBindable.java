@@ -24,7 +24,6 @@ import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.Name;
 import groovy.beans.Bindable;
 import lombok.core.AnnotationValues;
-import lombok.javac.Javac;
 import lombok.javac.JavacAnnotationHandler;
 import lombok.javac.JavacNode;
 import org.slf4j.Logger;
@@ -36,9 +35,12 @@ import java.lang.reflect.Modifier;
 
 import static com.sun.tools.javac.code.Flags.*;
 import static lombok.core.util.Names.nameOfConstantBasedOnProperty;
+import static lombok.javac.Javac.toGetterName;
+import static lombok.javac.Javac.toSetterName;
 import static lombok.javac.handlers.AstBuilder.defMethod;
 import static lombok.javac.handlers.AstBuilder.defVar;
 import static lombok.javac.handlers.HandlerUtils.*;
+import static lombok.javac.handlers.HandlerUtils.toJavacModifier;
 import static lombok.javac.handlers.JavacHandlerUtil.*;
 import static lombok.javac.handlers.Lombok.newFieldAccessor;
 import static lombok.javac.handlers.MemberChecks.fieldAlreadyExists;
@@ -222,7 +224,7 @@ public class HandleBindable extends JavacAnnotationHandler<Bindable> {
 
     private JCExpression delegateToPropertySupport(String methodName, List<JCTree.JCExpression> args, JavacNode typeNode) {
         TreeMaker treeMaker = typeNode.getTreeMaker();
-        JCExpression fn = chainDots(treeMaker, typeNode, PROPERTY_SUPPORT_FIELD_NAME, methodName);
+        JCExpression fn = chainDots(typeNode, PROPERTY_SUPPORT_FIELD_NAME, methodName);
         return treeMaker.Apply(List.<JCExpression>nil(), fn, args);
     }
 
@@ -303,7 +305,7 @@ public class HandleBindable extends JavacAnnotationHandler<Bindable> {
 
     private JCStatement fireChangeEventMethodDecl(String propertyNameFieldName, Name oldValueName, JavacNode fieldNode) {
         TreeMaker treeMaker = fieldNode.getTreeMaker();
-        JCExpression fn = chainDots(treeMaker, fieldNode, "this", "firePropertyChange");
+        JCExpression fn = chainDots(fieldNode, "this", "firePropertyChange");
         List<JCExpression> args = List.of(treeMaker.Ident(fieldNode.toName(propertyNameFieldName)),
                 treeMaker.Ident(oldValueName),
                 newFieldAccessor(fieldNode));

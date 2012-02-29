@@ -14,17 +14,12 @@
  */
 package lombok.javac.handlers;
 
-import static com.sun.tools.javac.util.List.nil;
-
+import com.sun.tools.javac.tree.JCTree.*;
+import com.sun.tools.javac.tree.TreeMaker;
+import com.sun.tools.javac.util.List;
 import lombok.javac.JavacNode;
 
-import com.sun.tools.javac.tree.JCTree.JCBlock;
-import com.sun.tools.javac.tree.JCTree.JCExpression;
-import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
-import com.sun.tools.javac.tree.JCTree.JCTypeParameter;
-import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
-import com.sun.tools.javac.tree.*;
-import com.sun.tools.javac.util.List;
+import static com.sun.tools.javac.util.List.nil;
 
 /**
  * Simplifies creation of methods.

@@ -24,15 +24,15 @@ import com.sun.tools.javac.util.ListBuffer;
 import com.sun.tools.javac.util.Name;
 import griffon.util.GriffonClassUtils;
 import lombok.core.AST;
-import lombok.javac.Javac;
 import lombok.javac.JavacNode;
 import lombok.javac.handlers.types.JCBooleanType;
 
 import javax.lang.model.element.Modifier;
 import java.util.Set;
 
-import static lombok.javac.handlers.types.JCNoType.voidType;
+import static lombok.javac.handlers.JavacHandlerUtil.annotationTypeMatches;
 import static lombok.javac.handlers.JavacHandlerUtil.chainDotsString;
+import static lombok.javac.handlers.types.JCNoType.voidType;
 
 /**
  * @author Andres Almiray
@@ -46,13 +46,13 @@ public class HandlerUtils {
 
     public static JCTree.JCExpression makeType(String type, JavacNode node, TreeMaker maker) {
         if (type.startsWith("[L")) {
-            return maker.TypeArray(chainDotsString(maker, node, type.substring(2, type.length() - 1)));
+            return maker.TypeArray(chainDotsString(node, type.substring(2, type.length() - 1)));
         } else if (type.startsWith("[")) {
-            return maker.TypeArray(chainDotsString(maker, node, type.substring(1, type.length() - 1)));
+            return maker.TypeArray(chainDotsString(node, type.substring(1, type.length() - 1)));
         } else if (JCBooleanType.type.equals(type)) {
             return node.getTreeMaker().Type(JCBooleanType.booleanType());
         }
-        return chainDotsString(maker, node, type);
+        return chainDotsString(node, type);
     }
 
     public static JavacNode findTypeNodeFrom(JavacNode node) {
@@ -94,7 +94,7 @@ public class HandlerUtils {
     public static boolean hasAnnotation(JavacNode node, Class annotationClass) {
         for (JavacNode child : node.down()) {
             if (child.getKind() == AST.Kind.ANNOTATION) {
-                if (Javac.annotationTypeMatches(annotationClass, child)) {
+                if (annotationTypeMatches(annotationClass, child)) {
                     return true;
                 }
             }
@@ -256,7 +256,7 @@ public class HandlerUtils {
         }
 
         public JCTree.JCExpression type(String type) {
-            return chainDotsString(context.getTreeMaker(), context, type);
+            return chainDotsString(context, type);
         }
 
         public JCTree.JCExpression void_t() {
@@ -272,7 +272,7 @@ public class HandlerUtils {
         }
 
         public JCTree.JCExpression dotExpr(String expr) {
-            return chainDotsString(context.getTreeMaker(), context, expr);
+            return chainDotsString(context, expr);
         }
 
         public JCTree.JCMethodInvocation call(JCTree.JCExpression method) {
@@ -291,7 +291,7 @@ public class HandlerUtils {
             JCTree.JCClassDecl classDecl = (JCTree.JCClassDecl) node.get();
             final ListBuffer<JCTree.JCExpression> implementing = ListBuffer.lb();
             implementing.appendList(classDecl.implementing);
-            implementing.append(chainDotsString(context.getTreeMaker(), node, interfaceName));
+            implementing.append(chainDotsString(node, interfaceName));
             classDecl.implementing = implementing.toList();
         }
 

@@ -21,13 +21,13 @@ import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.ListBuffer;
-import lombok.javac.Javac;
 import lombok.javac.JavacNode;
 
 import static lombok.javac.handlers.HandlerUtils.makeType;
 import static lombok.javac.handlers.HandlerUtils.toList;
-import static lombok.javac.handlers.types.JCNoType.voidType;
 import static lombok.javac.handlers.JavacHandlerUtil.chainDotsString;
+import static lombok.javac.handlers.JavacHandlerUtil.recursiveSetGeneratedBy;
+import static lombok.javac.handlers.types.JCNoType.voidType;
 
 /**
  * @author Andres Almiray
@@ -123,7 +123,7 @@ public class AstBuilder {
 
             ListBuffer<JCTree.JCExpression> implemented = new ListBuffer<JCTree.JCExpression>();
             for (String type : interfaces) {
-                implemented.append(chainDotsString(context.getTreeMaker(), context, type));
+                implemented.append(chainDotsString(context, type));
             }
 
             return context.getTreeMaker().ClassDef(
@@ -298,7 +298,7 @@ public class AstBuilder {
                 initExpression = m.NewClass(null, null, typeExpression, args, null);
             }
 
-            return Javac.recursiveSetGeneratedBy(m.VarDef(
+            return recursiveSetGeneratedBy(m.VarDef(
                     m.Modifiers(modifiers),
                     context.toName(variableName),
                     typeExpression,

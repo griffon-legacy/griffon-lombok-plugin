@@ -77,11 +77,31 @@ public class HandleEventPublisher extends JavacAnnotationHandler<EventPublisher>
         createEventRouterField(typeNode);
         injectListenerManagementMethod(typeNode, "addEventListener");
         injectListenerManagementMethod(typeNode, "removeEventListener");
+        injectEventPublishingEnabledMethods(typeNode);
         injectEventPublisherMethod(typeNode, "publishEvent", "publish");
+        injectEventPublisherMethod(typeNode, "publishEventOutsideUI", "publishOutsideUI");
         injectEventPublisherMethod(typeNode, "publishEventOutside", "publishOutside");
         injectEventPublisherMethod(typeNode, "publishEventAsync", "publishAsync");
 
         if (LOG.isDebugEnabled()) LOG.debug("Modified " + typeNode.getName() + " as an EventPublisher.");
+    }
+
+    private void injectEventPublishingEnabledMethods(JavacNode typeNode) {
+        injectMethod(typeNode, defMethod("isEventPublishingEnabled")
+                .returning(Boolean.TYPE)
+                .withBody(bodyWithReturn("isEnabled", NIL_EXPRESSION, typeNode))
+                .$(typeNode));
+
+        TreeMaker treeMaker = typeNode.getTreeMaker();
+        List<JCTree.JCVariableDecl> params = List.of(
+                defVar("enabled")
+                        .type(Boolean.TYPE)
+                        .$(typeNode));
+        List<JCTree.JCExpression> args = extractArgNames(params, treeMaker);
+        injectMethod(typeNode, defMethod("setEventPublishingEnabled")
+                .withParams(params)
+                .withBody(body("setEnabled", args, typeNode))
+                .$(typeNode));
     }
 
     private void injectEventPublisherInterface(JavacNode typeNode) {
@@ -174,16 +194,22 @@ public class HandleEventPublisher extends JavacAnnotationHandler<EventPublisher>
         return List.<JCTree.JCStatement>of(treeMaker.Exec(delegateToPropertySupport));
     }
 
+    private List<JCTree.JCStatement> bodyWithReturn(String methodName, List<JCTree.JCExpression> args, JavacNode typeNode) {
+        TreeMaker treeMaker = typeNode.getTreeMaker();
+        JCTree.JCExpression delegateToPropertySupport = delegateToEventRouter(methodName, args, typeNode);
+        return List.<JCTree.JCStatement>of(treeMaker.Return(delegateToPropertySupport));
+    }
+
     private JCTree.JCExpression delegateToEventRouter(String methodName, List<JCTree.JCExpression> args, JavacNode typeNode) {
         TreeMaker treeMaker = typeNode.getTreeMaker();
-        JCTree.JCExpression fn = chainDots(treeMaker, typeNode, FIELD_NAME, methodName);
+        JCTree.JCExpression fn = chainDots(typeNode, FIELD_NAME, methodName);
         return treeMaker.Apply(List.<JCTree.JCExpression>nil(), fn, args);
     }
 
     private void createEventRouterField(JavacNode typeNode) {
         TreeMaker maker = typeNode.getTreeMaker();
 
-        JCTree.JCExpression type = chainDotsString(maker, typeNode, EventRouter.class.getName());
+        JCTree.JCExpression type = chainDotsString(typeNode, EventRouter.class.getName());
         JCTree.JCExpression instance = maker.NewClass(null, NIL_EXPRESSION, type, NIL_EXPRESSION, null);
 
         injectField(typeNode, defVar(FIELD_NAME)

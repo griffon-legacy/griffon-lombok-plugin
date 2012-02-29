@@ -36,7 +36,8 @@ import static lombok.javac.handlers.AstBuilder.defMethod;
 import static lombok.javac.handlers.AstBuilder.defVar;
 import static lombok.javac.handlers.HandlerUtils.NIL_EXPRESSION;
 import static lombok.javac.handlers.HandlerUtils.extractArgNames;
-import static lombok.javac.handlers.JavacHandlerUtil.*;
+import static lombok.javac.handlers.JavacHandlerUtil.deleteAnnotationIfNeccessary;
+import static lombok.javac.handlers.JavacHandlerUtil.injectMethod;
 
 /**
  * @author Andres Almiray
@@ -82,6 +83,39 @@ public class HandleThreadingAware extends JavacAnnotationHandler<ThreadingAware>
                         .type(Runnable.class)
                         .$(typeNode));
         List<JCTree.JCExpression> args = extractArgNames(params, m);
+        injectMethod(typeNode, defMethod("execInsideUIAsync")
+                .withParams(params)
+                .withBody(body("executeAsync", args, b))
+                .$(typeNode));
+
+        params = List.of(
+                defVar(RUNNABLE_PARAM)
+                        .modifiers(FINAL)
+                        .type(Runnable.class)
+                        .$(typeNode));
+        args = extractArgNames(params, m);
+        injectMethod(typeNode, defMethod("execInsideUISync")
+                .withParams(params)
+                .withBody(body("executeSync", args, b))
+                .$(typeNode));
+
+        params = List.of(
+                defVar(RUNNABLE_PARAM)
+                        .modifiers(FINAL)
+                        .type(Runnable.class)
+                        .$(typeNode));
+        args = extractArgNames(params, m);
+        injectMethod(typeNode, defMethod("execOutsideUI")
+                .withParams(params)
+                .withBody(body("executeOutside", args, b))
+                .$(typeNode));
+
+        params = List.of(
+                defVar(RUNNABLE_PARAM)
+                        .modifiers(FINAL)
+                        .type(Runnable.class)
+                        .$(typeNode));
+        args = extractArgNames(params, m);
         injectMethod(typeNode, defMethod("execAsync")
                 .withParams(params)
                 .withBody(body("executeAsync", args, b))

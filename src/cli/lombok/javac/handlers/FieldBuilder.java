@@ -14,16 +14,15 @@
  */
 package lombok.javac.handlers;
 
+import com.sun.tools.javac.tree.JCTree.JCExpression;
+import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
+import com.sun.tools.javac.tree.TreeMaker;
+import com.sun.tools.javac.util.List;
+import lombok.javac.JavacNode;
+
 import static com.sun.tools.javac.util.List.nil;
 import static lombok.core.util.Names.splitNameOf;
 import static lombok.javac.handlers.JavacHandlerUtil.chainDots;
-
-import lombok.javac.JavacNode;
-
-import com.sun.tools.javac.tree.JCTree.JCExpression;
-import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
-import com.sun.tools.javac.tree.*;
-import com.sun.tools.javac.util.List;
 
 /**
  * Simplifies creation of fields.
@@ -62,7 +61,7 @@ class FieldBuilder {
 
     JCVariableDecl buildWith(JavacNode node) {
         TreeMaker treeMaker = node.getTreeMaker();
-        JCExpression classType = chainDots(treeMaker, node, splitNameOf(type));
+        JCExpression classType = chainDots(node, splitNameOf(type));
         JCExpression newVar = treeMaker.NewClass(null, null, classType, args, null);
         return treeMaker.VarDef(treeMaker.Modifiers(modifiers), node.toName(name), classType, newVar);
     }
