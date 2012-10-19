@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 the original author or authors.
+ * Copyright 2009-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,133 +73,100 @@ public class HandleThreadingAware extends JavacAnnotationHandler<ThreadingAware>
         TreeMaker m = typeNode.getTreeMaker();
 
         injectMethod(typeNode, defMethod("isUIThread")
-                .returning(Boolean.TYPE)
-                .withBody(bodyWithReturn("isUIThread", NIL_EXPRESSION, b))
-                .$(typeNode));
+            .returning(Boolean.TYPE)
+            .withBody(bodyWithReturn("isUIThread", NIL_EXPRESSION, b))
+            .$(typeNode));
 
         List<JCTree.JCVariableDecl> params = List.of(
-                defVar(RUNNABLE_PARAM)
-                        .modifiers(FINAL)
-                        .type(Runnable.class)
-                        .$(typeNode));
+            defVar(RUNNABLE_PARAM)
+                .modifiers(FINAL)
+                .type(Runnable.class)
+                .$(typeNode));
         List<JCTree.JCExpression> args = extractArgNames(params, m);
         injectMethod(typeNode, defMethod("execInsideUIAsync")
-                .withParams(params)
-                .withBody(body("executeAsync", args, b))
-                .$(typeNode));
+            .withParams(params)
+            .withBody(body("executeAsync", args, b))
+            .$(typeNode));
 
         params = List.of(
-                defVar(RUNNABLE_PARAM)
-                        .modifiers(FINAL)
-                        .type(Runnable.class)
-                        .$(typeNode));
+            defVar(RUNNABLE_PARAM)
+                .modifiers(FINAL)
+                .type(Runnable.class)
+                .$(typeNode));
         args = extractArgNames(params, m);
         injectMethod(typeNode, defMethod("execInsideUISync")
-                .withParams(params)
-                .withBody(body("executeSync", args, b))
-                .$(typeNode));
+            .withParams(params)
+            .withBody(body("executeSync", args, b))
+            .$(typeNode));
 
         params = List.of(
-                defVar(RUNNABLE_PARAM)
-                        .modifiers(FINAL)
-                        .type(Runnable.class)
-                        .$(typeNode));
+            defVar(RUNNABLE_PARAM)
+                .modifiers(FINAL)
+                .type(Runnable.class)
+                .$(typeNode));
         args = extractArgNames(params, m);
         injectMethod(typeNode, defMethod("execOutsideUI")
-                .withParams(params)
-                .withBody(body("executeOutside", args, b))
-                .$(typeNode));
+            .withParams(params)
+            .withBody(body("executeOutside", args, b))
+            .$(typeNode));
 
         params = List.of(
-                defVar(RUNNABLE_PARAM)
-                        .modifiers(FINAL)
-                        .type(Runnable.class)
-                        .$(typeNode));
-        args = extractArgNames(params, m);
-        injectMethod(typeNode, defMethod("execAsync")
-                .withParams(params)
-                .withBody(body("executeAsync", args, b))
+            defVar(CLOSURE_PARAM)
+                .modifiers(FINAL)
+                .type(Closure.class)
                 .$(typeNode));
-
-        params = List.of(
-                defVar(RUNNABLE_PARAM)
-                        .modifiers(FINAL)
-                        .type(Runnable.class)
-                        .$(typeNode));
-        args = extractArgNames(params, m);
-        injectMethod(typeNode, defMethod("execSync")
-                .withParams(params)
-                .withBody(body("executeSync", args, b))
-                .$(typeNode));
-
-        params = List.of(
-                defVar(RUNNABLE_PARAM)
-                        .modifiers(FINAL)
-                        .type(Runnable.class)
-                        .$(typeNode));
-        args = extractArgNames(params, m);
-        injectMethod(typeNode, defMethod("execOutside")
-                .withParams(params)
-                .withBody(body("executeOutside", args, b))
-                .$(typeNode));
-
-        params = List.of(
-                defVar(CLOSURE_PARAM)
-                        .modifiers(FINAL)
-                        .type(Closure.class)
-                        .$(typeNode));
         args = extractArgNames(params, m);
         injectMethod(typeNode, defMethod(EXEC_FUTURE)
-                .returning(Future.class)
-                .withParams(params)
-                .withBody(bodyWithReturn(EXECUTE_FUTURE, args, b))
-                .$(typeNode));
+            .returning(Future.class)
+            .withParams(params)
+            .withBody(bodyWithReturn(EXECUTE_FUTURE, args, b))
+            .$(typeNode));
 
         params = List.of(
-                defVar(EXECUTOR_SERVICE_PARAM)
-                        .modifiers(FINAL)
-                        .type(ExecutorService.class)
-                        .$(typeNode),
-                defVar(CLOSURE_PARAM)
-                        .modifiers(FINAL)
-                        .type(Closure.class)
-                        .$(typeNode));
+            defVar(EXECUTOR_SERVICE_PARAM)
+                .modifiers(FINAL)
+                .type(ExecutorService.class)
+                .$(typeNode),
+            defVar(CLOSURE_PARAM)
+                .modifiers(FINAL)
+                .type(Closure.class)
+                .$(typeNode));
         args = extractArgNames(params, m);
         injectMethod(typeNode, defMethod(EXEC_FUTURE)
-                .returning(Future.class)
-                .withParams(params)
-                .withBody(bodyWithReturn(EXECUTE_FUTURE, args, b))
-                .$(typeNode));
+            .returning(Future.class)
+            .withParams(params)
+            .withBody(bodyWithReturn(EXECUTE_FUTURE, args, b))
+            .$(typeNode));
 
         params = List.of(
-                defVar(CALLABLE_PARAM)
-                        .modifiers(FINAL)
-                        .type(Callable.class)
-                        .$(typeNode));
+            defVar(CALLABLE_PARAM)
+                .modifiers(FINAL)
+                .type(Callable.class)
+                .$(typeNode));
         args = extractArgNames(params, m);
         injectMethod(typeNode, defMethod(EXEC_FUTURE)
-                .returning(Future.class)
-                .withParams(params)
-                .withBody(bodyWithReturn(EXECUTE_FUTURE, args, b))
-                .$(typeNode));
+            .returning(Future.class)
+            .withParams(params)
+            .withBody(bodyWithReturn(EXECUTE_FUTURE, args, b))
+            .$(typeNode));
 
         params = List.of(
-                defVar(EXECUTOR_SERVICE_PARAM)
-                        .modifiers(FINAL)
-                        .type(ExecutorService.class)
-                        .$(typeNode),
-                defVar(CALLABLE_PARAM)
-                        .modifiers(FINAL)
-                        .type(Callable.class)
-                        .$(typeNode));
+            defVar(EXECUTOR_SERVICE_PARAM)
+                .modifiers(FINAL)
+                .type(ExecutorService.class)
+                .$(typeNode),
+            defVar(CALLABLE_PARAM)
+                .modifiers(FINAL)
+                .type(Callable.class)
+                .$(typeNode));
         args = extractArgNames(params, m);
         injectMethod(typeNode, defMethod(EXEC_FUTURE)
-                .returning(Future.class)
-                .withParams(params)
-                .withBody(bodyWithReturn(EXECUTE_FUTURE, args, b))
-                .$(typeNode));
+            .returning(Future.class)
+            .withParams(params)
+            .withBody(bodyWithReturn(EXECUTE_FUTURE, args, b))
+            .$(typeNode));
 
-        if (LOG.isDebugEnabled()) LOG.debug("Modified " + typeNode.getName() + " as a ThreadingHandler.");
+        if (LOG.isDebugEnabled()) LOG.debug("Modified " + typeNode.getName() + " as ThreadingHandler.");
     }
 
     private List<JCTree.JCStatement> body(String methodName, List<JCTree.JCExpression> args, HandlerUtils.TokenBuilder b) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 the original author or authors.
+ * Copyright 2009-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,9 +72,9 @@ public class HandleThreading extends JavacAnnotationHandler<Threading> {
     private void handleMethodForInjection(TokenBuilder b, JavacNode methodNode, JCTree.JCMethodDecl method, String threadingMethod) {
         MethodDescriptor md = methodDescriptorFor(method);
         if (isPlainMethod(md) &&
-                !isEventHandler(md) &&
-                hasVoidOrDefAsReturnType(method) &&
-                !skipInjection(b.context.getName() + "." + method.getName())) {
+            !isEventHandler(md) &&
+            hasVoidOrDefAsReturnType(method) &&
+            !skipInjection(b.context.getName() + "." + method.getName())) {
             wrapStatements(b, methodNode, method, threadingMethod);
         }
     }
@@ -82,8 +82,8 @@ public class HandleThreading extends JavacAnnotationHandler<Threading> {
     private boolean hasVoidOrDefAsReturnType(JCTree.JCMethodDecl method) {
         String type = method.getReturnType().type.toString();
         return "void".equals(type) ||
-                "Object".equals(type) ||
-                "java.lang.Object".equals(type);
+            "Object".equals(type) ||
+            "java.lang.Object".equals(type);
     }
 
     private void wrapStatements(TokenBuilder b, JavacNode methodNode, JCTree.JCMethodDecl method, String threadingMethod) {
@@ -99,11 +99,11 @@ public class HandleThreading extends JavacAnnotationHandler<Threading> {
         TreeMaker m = methodNode.getTreeMaker();
 
         JCTree.JCClassDecl runnableClass = defClass("ThreadingWrapper_" + methodNode.getName().toString())
-                .modifiers(0)
-                .implementing(Runnable.class)
-                .withMembers(
-                        defMethod("run").withBody(method.getBody().getStatements()).$(methodNode)
-                ).$(methodNode);
+            .modifiers(0)
+            .implementing(Runnable.class)
+            .withMembers(
+                defMethod("run").withBody(method.getBody().getStatements()).$(methodNode)
+            ).$(methodNode);
         JCTree.JCExpression runnable = m.NewClass(null, NIL_EXPRESSION, b.type(Runnable.class), NIL_EXPRESSION, runnableClass);
 
         // 3. create call for UIThreadManager.getInstance().<threadingMethod>(runnable)

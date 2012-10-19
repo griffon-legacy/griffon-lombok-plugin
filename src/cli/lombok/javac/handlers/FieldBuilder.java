@@ -21,7 +21,7 @@ import com.sun.tools.javac.util.List;
 import lombok.javac.JavacNode;
 
 import static com.sun.tools.javac.util.List.nil;
-import static lombok.core.util.Names.splitNameOf;
+import static lombok.core.util.Naming.splitNameOf;
 import static lombok.javac.handlers.JavacHandlerUtil.chainDots;
 
 /**

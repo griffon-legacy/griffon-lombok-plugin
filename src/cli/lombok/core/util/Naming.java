@@ -21,7 +21,7 @@ import static java.lang.Character.*;
  *
  * @author Alex Ruiz
  */
-public final class Names {
+public final class Naming {
     /**
      * Splits the name of the class using "\." as the regular expression. For example, {@code java.lang.String} will be
      * split into { "java", "lang", "String" }.
@@ -54,6 +54,6 @@ public final class Names {
         return b.toString();
     }
 
-    private Names() {
+    private Naming() {
     }
 }

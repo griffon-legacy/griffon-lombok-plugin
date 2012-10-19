@@ -18,9 +18,9 @@
  */
 class LombokGriffonPlugin {
     // the plugin version
-    String version = '0.2'
+    String version = '0.3'
     // the version or versions of Griffon the plugin is designed for
-    String griffonVersion = '0.9.5 > *'
+    String griffonVersion = '1.1.0 > *'
     // the other plugins this plugin depends on
     Map dependsOn = [:]
     // resources that are included in plugin packaging
@@ -48,7 +48,7 @@ class LombokGriffonPlugin {
     String title = 'Enhance Java code with Lombok'
     // accepts Markdown syntax. See http://daringfireball.net/projects/markdown/ for details
     String description = '''
-Allows bytecode manipulation at compile time using [Project Lombok][1]. Think of Lombok as [AST transformations][1] for Java source.
+Allows bytecode manipulation at compile time using [Project Lombok][1]. Think of Lombok as [AST transformations][2] for Java sources.
 
 **Works with Javac only. Eclipse compiler support is forthcoming.**
 
@@ -58,10 +58,13 @@ Usage
 The Lombok plugin supports the following transformations
 
  * `@Threading` - modifies the method body to execute its contents in the appropriate threading context.
- * `@ThreadingAware` - injects the `griffon.core.ThreadingHandler` interface
- * `@ResourcesAware` - injects the `griffon.core.ResourceHandler` interface
- * `@EventPublisher` - injects the `griffon.core.EventPublisher` interface
- * `@Bindable` - injects the `griffon.core.Observable` interface.
+ * `@ThreadingAware` - injects the `[griffon.core.ThreadingHandler][4]` interface
+ * `@ResourcesAware` - injects the `[griffon.core.ResourceHandler][5]` interface
+ * `@EventPublisher` - injects the `[griffon.core.EventPublisher][6]` interface
+ * `@Bindable` - injects the `[griffon.core.Observable][7]` interface.
+ * `@MVCAware` - injects the `[griffon.core.MVCHandler][8]` interface
+ * `@MessageSourceAware` - injects the `[griffon.core.i18n.MessageSource][9]` interface
+ * `@ResourceResolverAware` - injects the `[griffon.core.resources.ResourceResolver][10]` interface
 
 In the case of `@Bindable` there are a couple of limitations at the moment that don't make it work exactly as its Groovy counterpart:
 
@@ -117,5 +120,12 @@ Additional transformations provided by [lombok-pg][3] are also available by inst
 [1]: http://projectlombok.org/
 [2]: http://groovy.codehaus.org/Compile-time+Metaprogramming+-+AST+Transformations
 [3]: https://github.com/peichhorn/lombok-pg
+[4]: http://griffon.codehaus.org/guide/latest/api/griffon/core/ThreadingHandler.html
+[5]: http://griffon.codehaus.org/guide/latest/api/griffon/core/ResourceHandler.html
+[6]: http://griffon.codehaus.org/guide/latest/api/griffon/core/EventPublisher.html
+[7]: http://griffon.codehaus.org/guide/latest/api/griffon/core/Observable.html
+[8]: http://griffon.codehaus.org/guide/latest/api/griffon/core/MVCHandler.html
+[9]: http://griffon.codehaus.org/guide/latest/api/griffon/core/i18n/MessageSource.html
+[10]: http://griffon.codehaus.org/guide/latest/api/griffon/core/resources/ResourceResolver.html
 '''
 }

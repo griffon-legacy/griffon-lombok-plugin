@@ -6,9 +6,13 @@ griffon.project.dependency.resolution = {
         mavenRepo 'http://repository.sonatype.org/content/groups/public'
     }
     dependencies {
-        String lombokVersion = '0.10.4'
+/*
+        String lombokVersion = '0.11.2'
         build "org.projectlombok:lombok:$lombokVersion",
               "com.github.peichhorn:lombok-pg:$lombokVersion"
+*/
+        build "org.projectlombok:lombok:0.11.4",
+              "com.github.peichhorn:lombok-pg:0.11.3"
     }
 }
 

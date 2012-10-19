@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 the original author or authors.
+ * Copyright 2009-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,28 +80,27 @@ public class HandleEventPublisher extends JavacAnnotationHandler<EventPublisher>
         injectEventPublishingEnabledMethods(typeNode);
         injectEventPublisherMethod(typeNode, "publishEvent", "publish");
         injectEventPublisherMethod(typeNode, "publishEventOutsideUI", "publishOutsideUI");
-        injectEventPublisherMethod(typeNode, "publishEventOutside", "publishOutside");
         injectEventPublisherMethod(typeNode, "publishEventAsync", "publishAsync");
 
-        if (LOG.isDebugEnabled()) LOG.debug("Modified " + typeNode.getName() + " as an EventPublisher.");
+        if (LOG.isDebugEnabled()) LOG.debug("Modified " + typeNode.getName() + " as EventPublisher.");
     }
 
     private void injectEventPublishingEnabledMethods(JavacNode typeNode) {
         injectMethod(typeNode, defMethod("isEventPublishingEnabled")
-                .returning(Boolean.TYPE)
-                .withBody(bodyWithReturn("isEnabled", NIL_EXPRESSION, typeNode))
-                .$(typeNode));
+            .returning(Boolean.TYPE)
+            .withBody(bodyWithReturn("isEnabled", NIL_EXPRESSION, typeNode))
+            .$(typeNode));
 
         TreeMaker treeMaker = typeNode.getTreeMaker();
         List<JCTree.JCVariableDecl> params = List.of(
-                defVar("enabled")
-                        .type(Boolean.TYPE)
-                        .$(typeNode));
+            defVar("enabled")
+                .type(Boolean.TYPE)
+                .$(typeNode));
         List<JCTree.JCExpression> args = extractArgNames(params, treeMaker);
         injectMethod(typeNode, defMethod("setEventPublishingEnabled")
-                .withParams(params)
-                .withBody(body("setEnabled", args, typeNode))
-                .$(typeNode));
+            .withParams(params)
+            .withBody(body("setEnabled", args, typeNode))
+            .$(typeNode));
     }
 
     private void injectEventPublisherInterface(JavacNode typeNode) {
@@ -113,78 +112,78 @@ public class HandleEventPublisher extends JavacAnnotationHandler<EventPublisher>
         TreeMaker treeMaker = typeNode.getTreeMaker();
 
         List<JCTree.JCVariableDecl> params = List.of(
-                defVar(LISTENER_PARAM)
-                        .modifiers(FINAL)
-                        .type(Object.class)
-                        .$(typeNode));
+            defVar(LISTENER_PARAM)
+                .modifiers(FINAL)
+                .type(Object.class)
+                .$(typeNode));
         List<JCTree.JCExpression> args = extractArgNames(params, treeMaker);
         injectMethod(typeNode, defMethod(methodName)
-                .withParams(params)
-                .withBody(body(methodName, args, typeNode))
-                .$(typeNode));
+            .withParams(params)
+            .withBody(body(methodName, args, typeNode))
+            .$(typeNode));
 
         params = List.of(
-                defVar(NAME_PARAM)
-                        .modifiers(FINAL)
-                        .type(String.class)
-                        .$(typeNode),
-                defVar(LISTENER_PARAM)
-                        .modifiers(FINAL)
-                        .type(Closure.class)
-                        .$(typeNode));
+            defVar(NAME_PARAM)
+                .modifiers(FINAL)
+                .type(String.class)
+                .$(typeNode),
+            defVar(LISTENER_PARAM)
+                .modifiers(FINAL)
+                .type(Closure.class)
+                .$(typeNode));
         args = extractArgNames(params, treeMaker);
 
         injectMethod(typeNode, defMethod(methodName)
-                .withParams(params)
-                .withBody(body(methodName, args, typeNode))
-                .$(typeNode));
+            .withParams(params)
+            .withBody(body(methodName, args, typeNode))
+            .$(typeNode));
 
         params = List.of(
-                defVar(NAME_PARAM)
-                        .modifiers(FINAL)
-                        .type(String.class)
-                        .$(typeNode),
-                defVar(LISTENER_PARAM)
-                        .modifiers(FINAL)
-                        .type(RunnableWithArgs.class)
-                        .$(typeNode));
+            defVar(NAME_PARAM)
+                .modifiers(FINAL)
+                .type(String.class)
+                .$(typeNode),
+            defVar(LISTENER_PARAM)
+                .modifiers(FINAL)
+                .type(RunnableWithArgs.class)
+                .$(typeNode));
         args = extractArgNames(params, treeMaker);
 
         injectMethod(typeNode, defMethod(methodName)
-                .withParams(params)
-                .withBody(body(methodName, args, typeNode))
-                .$(typeNode));
+            .withParams(params)
+            .withBody(body(methodName, args, typeNode))
+            .$(typeNode));
     }
 
     private void injectEventPublisherMethod(JavacNode typeNode, String methodName, String routerMethodName) {
         TreeMaker treeMaker = typeNode.getTreeMaker();
 
         List<JCTree.JCVariableDecl> params = List.of(
-                defVar(NAME_PARAM)
-                        .modifiers(FINAL)
-                        .type(String.class)
-                        .$(typeNode));
+            defVar(NAME_PARAM)
+                .modifiers(FINAL)
+                .type(String.class)
+                .$(typeNode));
         List<JCTree.JCExpression> args = extractArgNames(params, treeMaker);
         injectMethod(typeNode, defMethod(methodName)
-                .withParams(params)
-                .withBody(body(routerMethodName, args, typeNode))
-                .$(typeNode));
+            .withParams(params)
+            .withBody(body(routerMethodName, args, typeNode))
+            .$(typeNode));
 
         params = List.of(
-                defVar(NAME_PARAM)
-                        .modifiers(FINAL)
-                        .type(String.class)
-                        .$(typeNode),
-                defVar(ARGS_PARAM)
-                        .modifiers(FINAL)
-                        .type(java.util.List.class)
-                        .$(typeNode));
+            defVar(NAME_PARAM)
+                .modifiers(FINAL)
+                .type(String.class)
+                .$(typeNode),
+            defVar(ARGS_PARAM)
+                .modifiers(FINAL)
+                .type(java.util.List.class)
+                .$(typeNode));
         args = extractArgNames(params, treeMaker);
 
         injectMethod(typeNode, defMethod(methodName)
-                .withParams(params)
-                .withBody(body(routerMethodName, args, typeNode))
-                .$(typeNode));
+            .withParams(params)
+            .withBody(body(routerMethodName, args, typeNode))
+            .$(typeNode));
     }
 
 
@@ -213,10 +212,9 @@ public class HandleEventPublisher extends JavacAnnotationHandler<EventPublisher>
         JCTree.JCExpression instance = maker.NewClass(null, NIL_EXPRESSION, type, NIL_EXPRESSION, null);
 
         injectField(typeNode, defVar(FIELD_NAME)
-                .modifiers(PRIVATE | FINAL)
-                .type(EventRouter.class)
-                .withValue(instance)
-                .$(typeNode));
-
+            .modifiers(PRIVATE | FINAL)
+            .type(EventRouter.class)
+            .withValue(instance)
+            .$(typeNode));
     }
 }

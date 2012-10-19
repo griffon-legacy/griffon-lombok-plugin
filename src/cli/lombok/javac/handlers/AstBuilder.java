@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 the original author or authors.
+ * Copyright 2009-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,12 +127,12 @@ public class AstBuilder {
             }
 
             return context.getTreeMaker().ClassDef(
-                    m.Modifiers(modifiers),
-                    context.toName(className),
-                    typeParameters,
-                    superClass,
-                    toList(implemented),
-                    members);
+                m.Modifiers(modifiers),
+                context.toName(className),
+                typeParameters,
+                superClass,
+                toList(implemented),
+                members);
         }
     }
 
@@ -146,6 +146,7 @@ public class AstBuilder {
         private List<JCTree.JCVariableDecl> params;
         private List<JCTree.JCExpression> throwables;
         private List<JCTree.JCStatement> statements;
+        private String throwable;
 
         public MethodDefBuilder(String methodName) {
             this.methodName = methodName;
@@ -196,6 +197,16 @@ public class AstBuilder {
             return this;
         }
 
+        public MethodDefBuilder throwing(String throwable) {
+            this.throwable = throwable;
+            return this;
+        }
+
+        public MethodDefBuilder throwing(Class throwable) {
+            this.throwable = throwable.getName();
+            return this;
+        }
+
         public MethodDefBuilder withBody(List<JCTree.JCStatement> statements) {
             this.statements = statements;
             return this;
@@ -220,15 +231,25 @@ public class AstBuilder {
                 }
             }
 
+
+            List<JCTree.JCExpression> throwablesExpression = null;
+            if (throwables != null) {
+                throwablesExpression = throwables;
+            } else if (throwable != null) {
+                ListBuffer<JCTree.JCExpression> throwing = new ListBuffer<JCTree.JCExpression>();
+                throwing.append(chainDotsString(context, throwable));
+                throwablesExpression = toList(throwing);
+            }
+
             return context.getTreeMaker().MethodDef(
-                    m.Modifiers(modifiers),
-                    context.toName(methodName),
-                    returns,
-                    typeParameters,
-                    params,
-                    throwables,
-                    m.Block(0, statements),
-                    null);
+                m.Modifiers(modifiers),
+                context.toName(methodName),
+                returns,
+                typeParameters,
+                params,
+                throwablesExpression,
+                m.Block(0, statements),
+                null);
         }
     }
 
@@ -299,10 +320,10 @@ public class AstBuilder {
             }
 
             return recursiveSetGeneratedBy(m.VarDef(
-                    m.Modifiers(modifiers),
-                    context.toName(variableName),
-                    typeExpression,
-                    initExpression), source);
+                m.Modifiers(modifiers),
+                context.toName(variableName),
+                typeExpression,
+                initExpression), source);
         }
     }
 }

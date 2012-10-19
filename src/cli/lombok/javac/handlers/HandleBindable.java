@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 the original author or authors.
+ * Copyright 2009-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.Name;
 import groovy.beans.Bindable;
 import lombok.core.AnnotationValues;
+import lombok.core.util.Naming;
 import lombok.javac.JavacAnnotationHandler;
 import lombok.javac.JavacNode;
 import org.slf4j.Logger;
@@ -34,14 +35,13 @@ import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Modifier;
 
 import static com.sun.tools.javac.code.Flags.*;
-import static lombok.core.util.Names.nameOfConstantBasedOnProperty;
-import static lombok.javac.Javac.toGetterName;
-import static lombok.javac.Javac.toSetterName;
 import static lombok.javac.handlers.AstBuilder.defMethod;
 import static lombok.javac.handlers.AstBuilder.defVar;
 import static lombok.javac.handlers.HandlerUtils.*;
+import static lombok.javac.handlers.HandlerUtils.hasAnnotation;
 import static lombok.javac.handlers.HandlerUtils.toJavacModifier;
 import static lombok.javac.handlers.JavacHandlerUtil.*;
+import static lombok.javac.handlers.JavacHandlerUtil.injectMethod;
 import static lombok.javac.handlers.Lombok.newFieldAccessor;
 import static lombok.javac.handlers.MemberChecks.fieldAlreadyExists;
 import static lombok.javac.handlers.MemberChecks.methodAlreadyExists;
@@ -117,12 +117,12 @@ public class HandleBindable extends JavacAnnotationHandler<Bindable> {
         if (!isInstanceField(node)) return false;
         JCTree.JCVariableDecl field = (JCTree.JCVariableDecl) node.get();
         return !PROPERTY_SUPPORT_FIELD_NAME.equals(field.name.toString()) &&
-                (field.mods.flags & Flags.FINAL) == 0 &&
-                Modifier.isPrivate(toJavacModifier(field.mods));
+            (field.mods.flags & Flags.FINAL) == 0 &&
+            Modifier.isPrivate(toJavacModifier(field.mods));
     }
 
     private void createOrAdjustProperty(JavacNode typeNode, JavacNode field) {
-        String propertyNameFieldName = nameOfConstantBasedOnProperty(field.getName());
+        String propertyNameFieldName = Naming.nameOfConstantBasedOnProperty(field.getName());
         generatePropertyNameConstant(propertyNameFieldName, field, typeNode);
         generateSetter(field.getName(), propertyNameFieldName, field);
         generateGetter(field.getName(), field);
@@ -132,25 +132,25 @@ public class HandleBindable extends JavacAnnotationHandler<Bindable> {
         String methodName = "firePropertyChange";
         TreeMaker treeMaker = typeNode.getTreeMaker();
         List<JCTree.JCVariableDecl> params = List.of(
-                defVar(PROPERTY_NAME_PARAM)
-                        .modifiers(FINAL)
-                        .type(String.class)
-                        .$(typeNode),
-                defVar(OLD_VALUE_PARAM)
-                        .modifiers(FINAL)
-                        .type(Object.class)
-                        .$(typeNode),
-                defVar(NEW_VALUE_PARAM)
-                        .modifiers(FINAL)
-                        .type(Object.class)
-                        .$(typeNode));
+            defVar(PROPERTY_NAME_PARAM)
+                .modifiers(FINAL)
+                .type(String.class)
+                .$(typeNode),
+            defVar(OLD_VALUE_PARAM)
+                .modifiers(FINAL)
+                .type(Object.class)
+                .$(typeNode),
+            defVar(NEW_VALUE_PARAM)
+                .modifiers(FINAL)
+                .type(Object.class)
+                .$(typeNode));
         List<JCTree.JCExpression> args = extractArgNames(params, treeMaker);
 
         injectMethod(typeNode, defMethod(methodName)
-                .modifiers(PROTECTED)
-                .withParams(params)
-                .withBody(body(methodName, args, typeNode))
-                .$(typeNode));
+            .modifiers(PROTECTED)
+            .withParams(params)
+            .withBody(body(methodName, args, typeNode))
+            .$(typeNode));
     }
 
     private void injectListenerQueryMethod(JavacNode typeNode) {
@@ -160,54 +160,54 @@ public class HandleBindable extends JavacAnnotationHandler<Bindable> {
         List<JCTree.JCVariableDecl> params = List.nil();
         List<JCTree.JCExpression> args = List.nil();
         injectMethod(typeNode, defMethod(methodName)
-                .withParams(params)
-                .returning(PropertyChangeListener[].class)
-                .withBody(bodyWithReturn(methodName, args, typeNode))
-                .$(typeNode));
+            .withParams(params)
+            .returning(PropertyChangeListener[].class)
+            .withBody(bodyWithReturn(methodName, args, typeNode))
+            .$(typeNode));
 
         params = List.of(
-                defVar(NAME_PARAM)
-                        .modifiers(FINAL)
-                        .type(String.class)
-                        .$(typeNode));
+            defVar(NAME_PARAM)
+                .modifiers(FINAL)
+                .type(String.class)
+                .$(typeNode));
         args = extractArgNames(params, treeMaker);
 
         injectMethod(typeNode, defMethod(methodName)
-                .withParams(params)
-                .returning(PropertyChangeListener[].class)
-                .withBody(bodyWithReturn(methodName, args, typeNode))
-                .$(typeNode));
+            .withParams(params)
+            .returning(PropertyChangeListener[].class)
+            .withBody(bodyWithReturn(methodName, args, typeNode))
+            .$(typeNode));
     }
 
     private void injectListenerManagementMethod(String methodName, JavacNode typeNode) {
         TreeMaker treeMaker = typeNode.getTreeMaker();
 
         List<JCTree.JCVariableDecl> params = List.of(
-                defVar(LISTENER_PARAM)
-                        .modifiers(FINAL)
-                        .type(PropertyChangeListener.class)
-                        .$(typeNode));
+            defVar(LISTENER_PARAM)
+                .modifiers(FINAL)
+                .type(PropertyChangeListener.class)
+                .$(typeNode));
         List<JCTree.JCExpression> args = extractArgNames(params, treeMaker);
         injectMethod(typeNode, defMethod(methodName)
-                .withParams(params)
-                .withBody(body(methodName, args, typeNode))
-                .$(typeNode));
+            .withParams(params)
+            .withBody(body(methodName, args, typeNode))
+            .$(typeNode));
 
         params = List.of(
-                defVar(NAME_PARAM)
-                        .modifiers(FINAL)
-                        .type(String.class)
-                        .$(typeNode),
-                defVar(LISTENER_PARAM)
-                        .modifiers(FINAL)
-                        .type(PropertyChangeListener.class)
-                        .$(typeNode));
+            defVar(NAME_PARAM)
+                .modifiers(FINAL)
+                .type(String.class)
+                .$(typeNode),
+            defVar(LISTENER_PARAM)
+                .modifiers(FINAL)
+                .type(PropertyChangeListener.class)
+                .$(typeNode));
         args = extractArgNames(params, treeMaker);
 
         injectMethod(typeNode, defMethod(methodName)
-                .withParams(params)
-                .withBody(body(methodName, args, typeNode))
-                .$(typeNode));
+            .withParams(params)
+            .withBody(body(methodName, args, typeNode))
+            .$(typeNode));
     }
 
     private List<JCStatement> body(String methodName, List<JCTree.JCExpression> args, JavacNode typeNode) {
@@ -230,10 +230,10 @@ public class HandleBindable extends JavacAnnotationHandler<Bindable> {
 
     private void createPropertyChangeSupportField(JavacNode typeNode) {
         JCVariableDecl fieldDecl = defVar(PROPERTY_SUPPORT_FIELD_NAME)
-                .modifiers(PRIVATE | FINAL)
-                .type(PropertyChangeSupport.class)
-                .withArgs(thisExpression(typeNode))
-                .$(typeNode);
+            .modifiers(PRIVATE | FINAL)
+            .type(PropertyChangeSupport.class)
+            .withArgs(thisExpression(typeNode))
+            .$(typeNode);
         injectFieldSuppressWarnings(typeNode, fieldDecl);
     }
 
@@ -243,21 +243,21 @@ public class HandleBindable extends JavacAnnotationHandler<Bindable> {
         String propertyName = fieldNode.getName();
         if (fieldAlreadyExists(propertyNameFieldName, fieldNode)) return;
         injectField(typeNode, defVar(propertyNameFieldName)
-                .modifiers(PRIVATE | STATIC | FINAL)
-                .type(String.class)
-                .withValue(fieldNode.getTreeMaker().Literal(propertyName))
-                .$(typeNode));
+            .modifiers(PRIVATE | STATIC | FINAL)
+            .type(String.class)
+            .withValue(fieldNode.getTreeMaker().Literal(propertyName))
+            .$(typeNode));
     }
 
     private void generateSetter(String fieldName, String propertyNameFieldName, JavacNode fieldNode) {
-        String setterName = toSetterName((JCVariableDecl) fieldNode.get());
-        if (methodAlreadyExists(setterName, fieldNode)) return;
+        String setterName = toSetterName(fieldNode);
+        if (methodAlreadyExists(setterName, fieldNode, 1)) return;
         injectMethod(fieldNode.up(), createSetterDecl(fieldName, propertyNameFieldName, setterName, fieldNode));
     }
 
     private void generateGetter(String fieldName, JavacNode fieldNode) {
-        String getterName = toGetterName((JCVariableDecl) fieldNode.get());
-        if (methodAlreadyExists(getterName, fieldNode)) return;
+        String getterName = toGetterName(fieldNode);
+        if (methodAlreadyExists(getterName, fieldNode, 0)) return;
         injectMethod(fieldNode.up(), createGetterDecl(fieldName, getterName, fieldNode));
     }
 
@@ -270,13 +270,13 @@ public class HandleBindable extends JavacAnnotationHandler<Bindable> {
         // }
         JCVariableDecl fieldDecl = (JCVariableDecl) fieldNode.get();
         List<JCTree.JCVariableDecl> params = List.of(
-                defVar(fieldName)
-                        .type(fieldDecl.vartype)
-                        .$(fieldNode));
+            defVar(fieldName)
+                .type(fieldDecl.vartype)
+                .$(fieldNode));
         return defMethod(setterName)
-                .withParams(params)
-                .withBody(setterBody(propertyNameFieldName, fieldNode))
-                .$(fieldNode);
+            .withParams(params)
+            .withBody(setterBody(propertyNameFieldName, fieldNode))
+            .$(fieldNode);
     }
 
     private JCBlock setterBody(String propertyNameFieldName, JavacNode fieldNode) {
@@ -307,8 +307,8 @@ public class HandleBindable extends JavacAnnotationHandler<Bindable> {
         TreeMaker treeMaker = fieldNode.getTreeMaker();
         JCExpression fn = chainDots(fieldNode, "this", "firePropertyChange");
         List<JCExpression> args = List.of(treeMaker.Ident(fieldNode.toName(propertyNameFieldName)),
-                treeMaker.Ident(oldValueName),
-                newFieldAccessor(fieldNode));
+            treeMaker.Ident(oldValueName),
+            newFieldAccessor(fieldNode));
         JCMethodInvocation m = treeMaker.Apply(List.<JCExpression>nil(), fn, args);
         return treeMaker.Exec(m);
     }
@@ -316,13 +316,13 @@ public class HandleBindable extends JavacAnnotationHandler<Bindable> {
     private JCMethodDecl createGetterDecl(String fieldName, String getterName,
                                           JavacNode fieldNode) {
         // public String getFirstName() {
-        //   return this.firstName = firstName;
+        //   return this.firstName;
         // }
         JCVariableDecl fieldDecl = (JCVariableDecl) fieldNode.get();
         return defMethod(getterName)
-                .returning(fieldDecl.vartype)
-                .withBody(getterBody(fieldNode))
-                .$(fieldNode);
+            .returning(fieldDecl.vartype)
+            .withBody(getterBody(fieldNode))
+            .$(fieldNode);
     }
 
     private List<JCTree.JCStatement> getterBody(JavacNode fieldNode) {

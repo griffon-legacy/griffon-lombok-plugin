@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 the original author or authors.
+ * Copyright 2009-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import com.sun.tools.javac.util.Name;
 import griffon.util.GriffonClassUtils;
 import lombok.core.AST;
 import lombok.javac.JavacNode;
+import lombok.javac.handlers.ast.JavacASTMaker;
+import lombok.javac.handlers.ast.JavacType;
 import lombok.javac.handlers.types.JCBooleanType;
 
 import javax.lang.model.element.Modifier;
@@ -33,6 +35,22 @@ import java.util.Set;
 import static lombok.javac.handlers.JavacHandlerUtil.annotationTypeMatches;
 import static lombok.javac.handlers.JavacHandlerUtil.chainDotsString;
 import static lombok.javac.handlers.types.JCNoType.voidType;
+
+import static com.sun.tools.javac.code.Flags.*;
+
+
+import com.sun.tools.javac.code.Symbol.ClassSymbol;
+import com.sun.tools.javac.code.Symbol.MethodSymbol;
+import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.JCTree.JCBlock;
+import com.sun.tools.javac.tree.JCTree.JCClassDecl;
+import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
+import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
+import com.sun.tools.javac.util.ListBuffer;
+
+import lombok.javac.JavacNode;
+import lombok.javac.handlers.Javac;
+import lombok.javac.handlers.JavacHandlerUtil;
 
 /**
  * @author Andres Almiray
@@ -322,5 +340,20 @@ public class HandlerUtils {
             }
             return call(context.getTreeMaker().Select(receiver, name(methodName)), args);
         }
+    }
+
+    public static JCMethodDecl injectMethod(JavacType type, final lombok.ast.AbstractMethodDecl<?> methodDecl) {
+        JavacASTMaker builder = new JavacASTMaker(type.node(), type.get());
+        final JCMethodDecl method = builder.build(methodDecl, JCMethodDecl.class);
+        JavacHandlerUtil.injectMethod(type.node(), method);
+        if (methodDecl instanceof lombok.ast.WrappedMethodDecl) {
+            lombok.ast.WrappedMethodDecl node = (lombok.ast.WrappedMethodDecl) methodDecl;
+            MethodSymbol methodSymbol = (MethodSymbol) node.getWrappedObject();
+            JCClassDecl tree = type.get();
+            ClassSymbol c = tree.sym;
+            c.members_field.enter(methodSymbol, c.members_field, methodSymbol.enclClass().members_field);
+            method.sym = methodSymbol;
+        }
+        return method;
     }
 }

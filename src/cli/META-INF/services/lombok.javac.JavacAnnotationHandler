@@ -3,3 +3,6 @@ lombok.javac.handlers.HandleEventPublisher
 lombok.javac.handlers.HandleThreadingAware
 lombok.javac.handlers.HandleResourcesAware
 lombok.javac.handlers.HandleBindable
+lombok.javac.handlers.HandleMessageSourceAware
+lombok.javac.handlers.HandleResourceResolverAware
+lombok.javac.handlers.HandleMVCAware

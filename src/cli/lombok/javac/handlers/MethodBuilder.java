@@ -81,6 +81,6 @@ class MethodBuilder {
     JCMethodDecl buildWith(JavacNode node) {
         TreeMaker treeMaker = node.getTreeMaker();
         return treeMaker.MethodDef(treeMaker.Modifiers(modifiers), node.toName(name), returnType,
-                List.<JCTypeParameter>nil(), parameters, throwsClauses, body, defaultValue);
+            List.<JCTypeParameter>nil(), parameters, throwsClauses, body, defaultValue);
     }
 }

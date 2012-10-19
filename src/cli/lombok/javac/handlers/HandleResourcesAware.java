@@ -37,6 +37,7 @@ import static com.sun.tools.javac.code.Flags.PRIVATE;
 import static lombok.ast.AST.*;
 import static lombok.javac.handlers.AstBuilder.defVar;
 import static lombok.javac.handlers.HandlerUtils.NIL_EXPRESSION;
+import static lombok.javac.handlers.HandlerUtils.injectMethod;
 import static lombok.javac.handlers.JavacHandlerUtil.*;
 
 /**
@@ -68,7 +69,7 @@ public class HandleResourcesAware extends JavacAnnotationHandler<ResourcesAware>
 
                 final JavacType type = JavacType.typeOf(annotationNode, ast);
                 addResourceLocatorSupport(type);
-                type.rebuild();
+                typeNode.rebuild();
                 return;
             default:
                 annotationNode.addError("@ResourcesAware is legal only on types.");
@@ -101,12 +102,12 @@ public class HandleResourcesAware extends JavacAnnotationHandler<ResourcesAware>
             returnTypeRef.withTypeArgument(Type(typeParam));
         }
 
-        type.injectMethod(
-                MethodDecl(returnTypeRef, methodName)
-                        .makePublic()
-                        .withArgument(Arg(Type(String.class), NAME_PARAM))
-                        .withStatement(Return(Call(Name(FIELD_NAME), methodName)
-                                .withArgument(Name(NAME_PARAM))))
+        injectMethod(type,
+            MethodDecl(returnTypeRef, methodName)
+                .makePublic()
+                .withArgument(Arg(Type(String.class), NAME_PARAM))
+                .withStatement(Return(Call(Name(FIELD_NAME), methodName)
+                    .withArgument(Name(NAME_PARAM))))
         );
     }
 
@@ -117,10 +118,10 @@ public class HandleResourcesAware extends JavacAnnotationHandler<ResourcesAware>
         JCTree.JCExpression instance = maker.NewClass(null, NIL_EXPRESSION, type, NIL_EXPRESSION, null);
 
         injectField(typeNode, defVar(FIELD_NAME)
-                .modifiers(PRIVATE | FINAL)
-                .type(ResourceLocator.class)
-                .withValue(instance)
-                .$(typeNode));
+            .modifiers(PRIVATE | FINAL)
+            .type(ResourceLocator.class)
+            .withValue(instance)
+            .$(typeNode));
 
     }
 }

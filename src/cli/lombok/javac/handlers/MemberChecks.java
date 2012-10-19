@@ -44,8 +44,8 @@ final class MemberChecks {
         return existsYesOrNo(fieldExists(fieldName, node));
     }
 
-    static boolean methodAlreadyExists(String methodName, JavacNode node) {
-        return existsYesOrNo(methodExists(methodName, node));
+    static boolean methodAlreadyExists(String methodName, JavacNode node, int params) {
+        return existsYesOrNo(methodExists(methodName, node, params));
     }
 
     private static boolean existsYesOrNo(MemberExistsResult result) {
