@@ -14,40 +14,38 @@
  * limitations under the License.
  */
 
-package lombok.javac.handlers;
+package lombok.eclipse.handlers;
 
-import com.sun.tools.javac.tree.JCTree;
 import griffon.transform.MVCAware;
 import lombok.core.AnnotationValues;
 import lombok.core.MVCAwareConstants;
 import lombok.core.handlers.MVCAwareHandler;
-import lombok.javac.JavacAnnotationHandler;
-import lombok.javac.JavacNode;
-import lombok.javac.handlers.ast.JavacType;
+import lombok.eclipse.EclipseAnnotationHandler;
+import lombok.eclipse.EclipseNode;
+import lombok.eclipse.handlers.ast.EclipseType;
+import org.eclipse.jdt.internal.compiler.ast.Annotation;
 
 import static lombok.core.util.ErrorMessages.canBeUsedOnClassAndEnumOnly;
-import static lombok.javac.handlers.JavacHandlerUtil.deleteAnnotationIfNeccessary;
 
 /**
  * @author Andres Almiray
  */
-public class HandleMVCAware extends JavacAnnotationHandler<MVCAware> {
-    private final JavacMVCAwareHandler handler = new JavacMVCAwareHandler();
+public class HandleMVCAware extends EclipseAnnotationHandler<MVCAware> {
+    private final EclipseMVCAwareHandler handler = new EclipseMVCAwareHandler();
 
     @Override
-    public void handle(AnnotationValues<MVCAware> annotation, final JCTree.JCAnnotation source, final JavacNode annotationNode) {
-        deleteAnnotationIfNeccessary(annotationNode, MVCAware.class);
-
-        JavacType type = JavacType.typeOf(annotationNode, source);
+    public void handle(AnnotationValues<MVCAware> annotation, Annotation source, EclipseNode annotationNode) {
+        EclipseType type = EclipseType.typeOf(annotationNode, source);
         if (type.isAnnotation() || type.isInterface()) {
             annotationNode.addError(canBeUsedOnClassAndEnumOnly(MVCAware.class));
             return;
         }
-        JavacUtil.addInterface(type.node(), MVCAwareConstants.MVC_HANDLER_TYPE);
+
+        EclipseUtil.addInterface(type.get(), MVCAwareConstants.MVC_HANDLER_TYPE, source);
         handler.addMVCSupport(type);
         type.editor().rebuild();
     }
 
-    private static class JavacMVCAwareHandler extends MVCAwareHandler<JavacType> {
+    private static class EclipseMVCAwareHandler extends MVCAwareHandler<EclipseType> {
     }
 }

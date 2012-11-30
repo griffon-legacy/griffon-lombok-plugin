@@ -16,11 +16,10 @@
 
 package lombok.intellij.processor.clazz;
 
-import com.intellij.openapi.project.Project;
-import com.intellij.psi.*;
-import de.plushnikov.intellij.lombok.ErrorMessages;
-import de.plushnikov.intellij.lombok.problem.ProblemBuilder;
-import de.plushnikov.intellij.lombok.processor.clazz.AbstractLombokClassProcessor;
+import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiMethod;
 import de.plushnikov.intellij.lombok.util.PsiMethodUtil;
 import griffon.transform.ResourceResolverAware;
 import lombok.core.ResourceResolverAwareConstants;
@@ -32,33 +31,14 @@ import java.util.List;
 /**
  * @author Andres Almiray
  */
-public class ResourceResolverAwareProcessor extends AbstractLombokClassProcessor implements ResourceResolverAwareConstants {
+public class ResourceResolverAwareProcessor extends AbstractGriffonLombokClassProcessor implements ResourceResolverAwareConstants {
     public ResourceResolverAwareProcessor() {
         super(ResourceResolverAware.class, PsiMethod.class);
-    }
-
-    @Override
-    protected boolean validate(@NotNull PsiAnnotation psiAnnotation, @NotNull PsiClass psiClass, @NotNull ProblemBuilder builder) {
-        return validateAnnotationOnRigthType(psiClass, builder);
-    }
-
-    protected boolean validateAnnotationOnRigthType(@NotNull PsiClass psiClass, @NotNull ProblemBuilder builder) {
-        boolean result = true;
-        if (psiClass.isAnnotationType() || psiClass.isInterface() || psiClass.isEnum()) {
-            builder.addError(ErrorMessages.canBeUsedOnClassOnly(ResourceResolverAware.class));
-            result = false;
-        }
-        return result;
     }
 
     protected <Psi extends PsiElement> void processIntern(@NotNull PsiClass psiClass, @NotNull PsiAnnotation psiAnnotation, @NotNull List<Psi> target) {
         for (MethodDescriptor methodDesc : METHODS) {
             target.add((Psi) PsiMethodUtil.createMethod(psiClass, methodDesc.signature, psiAnnotation));
         }
-    }
-
-    private PsiElementFactory psiElementFactory(PsiClass psiClass) {
-        Project project = psiClass.getProject();
-        return JavaPsiFacade.getElementFactory(project);
     }
 }

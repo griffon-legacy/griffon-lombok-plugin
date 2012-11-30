@@ -31,17 +31,36 @@ import static lombok.ast.AST.*;
  * @author Andres Almiray
  */
 public abstract class AbstractHandler<TYPE_TYPE extends IType<? extends IMethod<?, ?, ?, ?>, ?, ?, ?, ?, ?>> implements BaseConstants {
-    public TypeRef asTypeRef(MethodDescriptor.Type type) {
+    protected TypeRef asTypeRef(MethodDescriptor.Type type) {
+        if (type instanceof MethodDescriptor.Wildcard) {
+            MethodDescriptor.Wildcard wildcard = (MethodDescriptor.Wildcard) type;
+            if (wildcard.isExtends()) {
+                return Wildcard(Wildcard.Bound.EXTENDS, Type(wildcard.parameters[0].type));
+            } else if (wildcard.isSuper()) {
+                return Wildcard(Wildcard.Bound.SUPER, Type(wildcard.parameters[0].type));
+            } else {
+                return Wildcard();
+            }
+        }
+
         TypeRef typeRef = Type(type.type);
         if (type.parameters.length > 0) {
             List<TypeRef> types = new ArrayList<TypeRef>();
             for (int i = 0; i < type.parameters.length; i++) {
-                types.add(Type(type.parameters[i]));
+                types.add(asTypeRef(type.parameters[i]));
             }
             typeRef.withTypeArguments(types);
         }
         if (type.dimensions > 0) typeRef.withDimensions(type.dimensions);
         return typeRef;
+    }
+
+    protected TypeParam asTypeParam(MethodDescriptor.TypeParam tp) {
+        TypeParam typeParam = TypeParam(tp.type);
+        if (tp.isBound()) {
+            typeParam.withBound(asTypeRef(tp.bound));
+        }
+        return typeParam;
     }
 
     public Expression<?> getApplicationExpression() {
@@ -101,7 +120,7 @@ public abstract class AbstractHandler<TYPE_TYPE extends IType<? extends IMethod<
             if (methodDesc.typeParameters.length > 0) {
                 List<TypeParam> types = new ArrayList<TypeParam>();
                 for (int i = 0; i < methodDesc.typeParameters.length; i++) {
-                    types.add(TypeParam(methodDesc.typeParameters[i]));
+                    types.add(asTypeParam(methodDesc.typeParameters[i]));
                 }
                 methodDecl.withTypeParameters(types);
             }

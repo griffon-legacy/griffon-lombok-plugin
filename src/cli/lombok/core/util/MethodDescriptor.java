@@ -20,40 +20,41 @@ package lombok.core.util;
  * @author Andres Almiray
  */
 public class MethodDescriptor {
-    private static final String[] EMPTY_PARAMETERS = new String[0];
+    private static final TypeParam[] EMPTY_PARAMETERS = new TypeParam[0];
     private static final Type[] EMPTY_TYPES = new Type[0];
+    private static final Type NO_BOUND = new Type("_");
 
     public static class Type {
         public final String type;
-        public final String[] parameters;
+        public final Type[] parameters;
         public final int dimensions;
-        public final String typeSignature;
+        public final String signature;
 
         public Type(String type) {
-            this(type, 0, EMPTY_PARAMETERS);
+            this(type, 0, EMPTY_TYPES);
         }
 
         public Type(String type, int dimensions) {
-            this(type, dimensions, EMPTY_PARAMETERS);
+            this(type, dimensions, EMPTY_TYPES);
         }
 
-        public Type(String type, String[] parameters) {
+        public Type(String type, Type[] parameters) {
             this(type, 0, parameters);
         }
 
-        public Type(String type, int dimensions, String[] parameters) {
+        public Type(String type, int dimensions, Type[] parameters) {
             this.type = type;
             this.dimensions = dimensions;
-            this.parameters = parameters != null ? parameters : EMPTY_PARAMETERS;
-            this.typeSignature = createTypeSignature();
+            this.parameters = parameters != null ? parameters : EMPTY_TYPES;
+            this.signature = createTypeSignature();
         }
 
-        private String createTypeSignature() {
+        protected String createTypeSignature() {
             StringBuilder b = new StringBuilder(type);
             if (parameters.length > 0) {
                 b.append("<");
                 for (int i = 0; i < parameters.length; i++) {
-                    b.append(parameters[i]);
+                    b.append(parameters[i].signature);
                     if (i < parameters.length - 1) b.append(", ");
                 }
                 b.append(">");
@@ -65,14 +66,83 @@ public class MethodDescriptor {
         }
     }
 
+    public static class Wildcard extends Type {
+        public static final String EXTENDS = "extends";
+        public static final String SUPER = "super";
+        public static final String NONE = "_";
+
+        public final String bound;
+
+        public Wildcard() {
+            this(NONE, EMPTY_TYPES);
+        }
+
+        public Wildcard(Type[] parameters) {
+            this(EXTENDS, parameters);
+        }
+
+        public Wildcard(String bound, Type[] parameters) {
+            super("?", parameters);
+            this.bound = bound;
+        }
+
+        public boolean isExtends() {
+            return EXTENDS.equals(bound);
+        }
+
+        public boolean isSuper() {
+            return SUPER.equals(bound);
+        }
+
+        protected String createTypeSignature() {
+            StringBuilder b = new StringBuilder(type);
+            if (parameters.length > 0) {
+                b.append(" ").append(bound).append(" ");
+                for (int i = 0; i < parameters.length; i++) {
+                    b.append(parameters[i].signature);
+                    if (i < parameters.length - 1) b.append(", ");
+                }
+            }
+            return b.toString();
+        }
+    }
+
+    public static class TypeParam {
+        public final String type;
+        public final Type bound;
+        public final String signature;
+
+        public TypeParam(String type) {
+            this(type, NO_BOUND);
+        }
+
+        public TypeParam(String type, Type bound) {
+            this.type = type;
+            this.bound = bound != null ? bound : NO_BOUND;
+            this.signature = createTypeParamSignature();
+        }
+
+        public boolean isBound() {
+            return bound != NO_BOUND;
+        }
+
+        private String createTypeParamSignature() {
+            StringBuilder b = new StringBuilder(type);
+            if (bound != NO_BOUND) {
+                b.append(" extends ").append(bound.signature);
+            }
+            return b.toString();
+        }
+    }
+
     public final String methodName;
     public final Type returnType;
-    public final String[] typeParameters;
+    public final TypeParam[] typeParameters;
     public final Type[] exceptions;
     public final Type[] arguments;
     public final String signature;
 
-    public MethodDescriptor(Type returnType, String[] typeParameters, String methodName, Type[] arguments, Type[] exceptions) {
+    public MethodDescriptor(Type returnType, TypeParam[] typeParameters, String methodName, Type[] arguments, Type[] exceptions) {
         this.returnType = returnType;
         this.methodName = methodName;
         this.typeParameters = typeParameters != null ? typeParameters : EMPTY_PARAMETERS;
@@ -86,18 +156,18 @@ public class MethodDescriptor {
         if (typeParameters.length > 0) {
             b.append("<");
             for (int i = 0; i < typeParameters.length; i++) {
-                b.append(typeParameters[i]);
+                b.append(typeParameters[i].signature);
                 if (i < typeParameters.length - 1) b.append(", ");
             }
             b.append("> ");
         }
-        b.append(returnType.typeSignature)
+        b.append(returnType.signature)
             .append(" ")
             .append(methodName)
             .append("(");
         if (arguments.length > 0) {
             for (int i = 0; i < arguments.length; i++) {
-                b.append(arguments[i].typeSignature)
+                b.append(arguments[i].signature)
                     .append(" arg")
                     .append(i);
                 if (i < arguments.length - 1) b.append(", ");
@@ -107,23 +177,67 @@ public class MethodDescriptor {
         if (exceptions.length > 0) {
             b.append(" throws ");
             for (int i = 0; i < exceptions.length; i++) {
-                b.append(exceptions[i].typeSignature);
+                b.append(exceptions[i].signature);
                 if (i < exceptions.length - 1) b.append(", ");
             }
         }
         return b.toString();
     }
 
-    public static Type type(String type, String... typeParameters) {
-        return new Type(type, typeParameters);
+    public static Wildcard wildcard(String... types) {
+        return new Wildcard(types(types));
     }
 
-    public static Type type(String type, int dimensions, String... typeParameters) {
-        return new Type(type, dimensions, typeParameters);
+    public static Wildcard wildcardWithParams(Type... types) {
+        return new Wildcard(types);
     }
 
-    public static String[] typeParams(String... typeParameters) {
+    public static Type type(String type, String... types) {
+        return new Type(type, types(types));
+    }
+
+    public static Type type(String type, int dimensions, String... types) {
+        return new Type(type, dimensions, types(types));
+    }
+
+    public static Type typeWithParams(String type, Type... types) {
+        return new Type(type, types);
+    }
+
+    public static Type typeWithParams(String type, int dimensions, Type... types) {
+        return new Type(type, dimensions, types);
+    }
+
+    public static TypeParam[] typeParams(String... typeParameters) {
+        TypeParam[] params = new TypeParam[typeParameters.length];
+        for (int i = 0; i < typeParameters.length; i++) {
+            params[i] = new TypeParam(typeParameters[i]);
+        }
+        return params;
+    }
+
+    public static TypeParam[] typeParams(TypeParam... typeParameters) {
         return typeParameters;
+    }
+
+    public static TypeParam typeParam(String type) {
+        return new TypeParam(type);
+    }
+
+    public static TypeParam typeParam(String type, String bound) {
+        return new TypeParam(type, type(bound));
+    }
+
+    public static TypeParam typeParam(String type, Type bound) {
+        return new TypeParam(type, bound);
+    }
+
+    public static Type[] types(String... types) {
+        Type[] t = new Type[types.length];
+        for (int i = 0; i < types.length; i++) {
+            t[i] = type(types[i]);
+        }
+        return t;
     }
 
     public static Type[] args(Type... types) {
@@ -134,11 +248,11 @@ public class MethodDescriptor {
         return types;
     }
 
-    public static MethodDescriptor method(Type type, String[] typeParameters, String methodName, Type[] args) {
+    public static MethodDescriptor method(Type type, TypeParam[] typeParameters, String methodName, Type[] args) {
         return new MethodDescriptor(type, typeParameters, methodName, args, EMPTY_TYPES);
     }
 
-    public static MethodDescriptor method(Type type, String[] typeParameters, String methodName) {
+    public static MethodDescriptor method(Type type, TypeParam[] typeParameters, String methodName) {
         return new MethodDescriptor(type, typeParameters, methodName, EMPTY_TYPES, EMPTY_TYPES);
     }
 
@@ -150,7 +264,7 @@ public class MethodDescriptor {
         return new MethodDescriptor(type, EMPTY_PARAMETERS, methodName, EMPTY_TYPES, EMPTY_TYPES);
     }
 
-    public static MethodDescriptor method(Type type, String[] typeParameters, String methodName, Type[] args, Type[] exceptions) {
+    public static MethodDescriptor method(Type type, TypeParam[] typeParameters, String methodName, Type[] args, Type[] exceptions) {
         return new MethodDescriptor(type, typeParameters, methodName, args, exceptions);
     }
 

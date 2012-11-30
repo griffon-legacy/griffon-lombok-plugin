@@ -21,8 +21,8 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import de.plushnikov.intellij.lombok.util.PsiMethodUtil;
-import griffon.transform.ThreadingAware;
-import lombok.core.ThreadingAwareConstants;
+import griffon.transform.MVCAware;
+import lombok.core.MVCAwareConstants;
 import lombok.core.util.MethodDescriptor;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,9 +31,9 @@ import java.util.List;
 /**
  * @author Andres Almiray
  */
-public class ThreadingAwareProcessor extends AbstractGriffonLombokClassProcessor implements ThreadingAwareConstants {
-    public ThreadingAwareProcessor() {
-        super(ThreadingAware.class, PsiMethod.class);
+public class MVCAwareProcessor extends AbstractGriffonLombokClassProcessor implements MVCAwareConstants {
+    public MVCAwareProcessor() {
+        super(MVCAware.class, PsiMethod.class);
     }
 
     protected <Psi extends PsiElement> void processIntern(@NotNull PsiClass psiClass, @NotNull PsiAnnotation psiAnnotation, @NotNull List<Psi> target) {

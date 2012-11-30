@@ -20,6 +20,7 @@ package lombok.core;
  * @author Andres Almiray
  */
 public interface BaseConstants {
+    String WILDCARD = "?";
     String R = "R";
     String T = "T";
     String VOID = "void";
