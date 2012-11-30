@@ -14,41 +14,38 @@
  * limitations under the License.
  */
 
-package lombok.javac.handlers;
+package lombok.eclipse.handlers;
 
-import com.sun.tools.javac.tree.JCTree;
 import griffon.transform.EventPublisher;
 import lombok.core.AnnotationValues;
 import lombok.core.EventPublisherConstants;
 import lombok.core.handlers.EventPublisherHandler;
-import lombok.javac.JavacAnnotationHandler;
-import lombok.javac.JavacNode;
-import lombok.javac.handlers.ast.JavacType;
+import lombok.eclipse.EclipseAnnotationHandler;
+import lombok.eclipse.EclipseNode;
+import lombok.eclipse.handlers.ast.EclipseType;
+import org.eclipse.jdt.internal.compiler.ast.Annotation;
 
 import static lombok.core.util.ErrorMessages.canBeUsedOnClassAndEnumOnly;
-import static lombok.javac.handlers.JavacHandlerUtil.deleteAnnotationIfNeccessary;
 
 /**
  * @author Andres Almiray
  */
-public class HandleEventPublisher extends JavacAnnotationHandler<EventPublisher> {
-    private final JavacEventPublisherHandler handler = new JavacEventPublisherHandler();
+public class HandleEventPublisher extends EclipseAnnotationHandler<EventPublisher> {
+    private final EclipseEventPublisherHandler handler = new EclipseEventPublisherHandler();
 
     @Override
-    public void handle(AnnotationValues<EventPublisher> annotation, final JCTree.JCAnnotation source, final JavacNode annotationNode) {
-        deleteAnnotationIfNeccessary(annotationNode, EventPublisher.class);
-
-        JavacType type = JavacType.typeOf(annotationNode, source);
+    public void handle(AnnotationValues<EventPublisher> annotation, Annotation source, EclipseNode annotationNode) {
+        EclipseType type = EclipseType.typeOf(annotationNode, source);
         if (type.isAnnotation() || type.isInterface()) {
             annotationNode.addError(canBeUsedOnClassAndEnumOnly(EventPublisher.class));
             return;
         }
 
-        JavacUtil.addInterface(type.node(), EventPublisherConstants.EVENT_PUBLISHER_TYPE);
+        EclipseUtil.addInterface(type.get(), EventPublisherConstants.EVENT_PUBLISHER_TYPE, source);
         handler.addEventPublisherSupport(type);
         type.editor().rebuild();
     }
 
-    private static class JavacEventPublisherHandler extends EventPublisherHandler<JavacType> {
+    private static class EclipseEventPublisherHandler extends EventPublisherHandler<EclipseType> {
     }
 }

@@ -14,41 +14,38 @@
  * limitations under the License.
  */
 
-package lombok.javac.handlers;
+package lombok.eclipse.handlers;
 
-import com.sun.tools.javac.tree.JCTree;
 import griffon.transform.MessageSourceAware;
 import lombok.core.AnnotationValues;
 import lombok.core.MessageSourceAwareConstants;
 import lombok.core.handlers.MessageSourceAwareHandler;
-import lombok.javac.JavacAnnotationHandler;
-import lombok.javac.JavacNode;
-import lombok.javac.handlers.ast.JavacType;
+import lombok.eclipse.EclipseAnnotationHandler;
+import lombok.eclipse.EclipseNode;
+import lombok.eclipse.handlers.ast.EclipseType;
+import org.eclipse.jdt.internal.compiler.ast.Annotation;
 
 import static lombok.core.util.ErrorMessages.canBeUsedOnClassAndEnumOnly;
-import static lombok.javac.handlers.JavacHandlerUtil.deleteAnnotationIfNeccessary;
 
 /**
  * @author Andres Almiray
  */
-public class HandleMessageSourceAware extends JavacAnnotationHandler<MessageSourceAware> {
-    private final JavacMessageSourceAwareHandler handler = new JavacMessageSourceAwareHandler();
+public class HandleMessageSourceAware extends EclipseAnnotationHandler<MessageSourceAware> {
+    private final EclipseMessageSourceAwareHandler handler = new EclipseMessageSourceAwareHandler();
 
     @Override
-    public void handle(AnnotationValues<MessageSourceAware> annotation, final JCTree.JCAnnotation source, final JavacNode annotationNode) {
-        deleteAnnotationIfNeccessary(annotationNode, MessageSourceAware.class);
-
-        JavacType type = JavacType.typeOf(annotationNode, source);
+    public void handle(AnnotationValues<MessageSourceAware> annotation, Annotation source, EclipseNode annotationNode) {
+        EclipseType type = EclipseType.typeOf(annotationNode, source);
         if (type.isAnnotation() || type.isInterface()) {
             annotationNode.addError(canBeUsedOnClassAndEnumOnly(MessageSourceAware.class));
             return;
         }
 
-        JavacUtil.addInterface(type.node(), MessageSourceAwareConstants.MESSAGE_SOURCE_TYPE);
+        EclipseUtil.addInterface(type.get(), MessageSourceAwareConstants.MESSAGE_SOURCE_TYPE, source);
         handler.addMessageSourceSupport(type);
         type.editor().rebuild();
     }
 
-    private static class JavacMessageSourceAwareHandler extends MessageSourceAwareHandler<JavacType> {
+    private static class EclipseMessageSourceAwareHandler extends MessageSourceAwareHandler<EclipseType> {
     }
 }

@@ -27,8 +27,8 @@ import lombok.core.AST.Kind;
 import lombok.core.AnnotationValues;
 import lombok.javac.JavacAnnotationHandler;
 import lombok.javac.JavacNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
 
 import static griffon.util.GriffonClassUtils.isEventHandler;
 import static griffon.util.GriffonClassUtils.isPlainMethod;
@@ -43,7 +43,7 @@ import static org.codehaus.griffon.ast.ThreadingASTTransformation.skipInjection;
  * @author Andres Almiray
  */
 public class HandleThreading extends JavacAnnotationHandler<Threading> {
-    private static final Logger LOG = LoggerFactory.getLogger(HandleThreading.class);
+    // private static final Logger LOG = LoggerFactory.getLogger(HandleThreading.class);
 
     public void handle(AnnotationValues<Threading> annotation, JCAnnotation ast, JavacNode annotationNode) {
         deleteAnnotationIfNeccessary(annotationNode, Threading.class);
@@ -114,9 +114,9 @@ public class HandleThreading extends JavacAnnotationHandler<Threading> {
         // 4. substitute method body
         method.body = m.Block(0, List.<JCTree.JCStatement>of(m.Exec(call)));
 
-        if (LOG.isDebugEnabled()) {
+        /*if (LOG.isDebugEnabled()) {
             LOG.debug("Modified " + b.context.getName() + "." + method.getName() + "() - code wrapped with " + threadingMethod + "{}");
-        }
+        }*/
     }
 
     private void makeFinal(JCTree.JCVariableDecl parameter) {

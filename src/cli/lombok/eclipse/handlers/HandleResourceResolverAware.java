@@ -14,41 +14,38 @@
  * limitations under the License.
  */
 
-package lombok.javac.handlers;
+package lombok.eclipse.handlers;
 
-import com.sun.tools.javac.tree.JCTree;
 import griffon.transform.ResourceResolverAware;
 import lombok.core.AnnotationValues;
 import lombok.core.ResourceResolverAwareConstants;
 import lombok.core.handlers.ResourceResolverAwareHandler;
-import lombok.javac.JavacAnnotationHandler;
-import lombok.javac.JavacNode;
-import lombok.javac.handlers.ast.JavacType;
+import lombok.eclipse.EclipseAnnotationHandler;
+import lombok.eclipse.EclipseNode;
+import lombok.eclipse.handlers.ast.EclipseType;
+import org.eclipse.jdt.internal.compiler.ast.Annotation;
 
 import static lombok.core.util.ErrorMessages.canBeUsedOnClassAndEnumOnly;
-import static lombok.javac.handlers.JavacHandlerUtil.deleteAnnotationIfNeccessary;
 
 /**
  * @author Andres Almiray
  */
-public class HandleResourceResolverAware extends JavacAnnotationHandler<ResourceResolverAware> {
-    private final JavacResourceResolverAwareHandler handler = new JavacResourceResolverAwareHandler();
+public class HandleResourceResolverAware extends EclipseAnnotationHandler<ResourceResolverAware> {
+    private final EclipseResourceResolverAwareHandler handler = new EclipseResourceResolverAwareHandler();
 
     @Override
-    public void handle(AnnotationValues<ResourceResolverAware> annotation, final JCTree.JCAnnotation source, final JavacNode annotationNode) {
-        deleteAnnotationIfNeccessary(annotationNode, ResourceResolverAware.class);
-
-        JavacType type = JavacType.typeOf(annotationNode, source);
+    public void handle(AnnotationValues<ResourceResolverAware> annotation, Annotation source, EclipseNode annotationNode) {
+        EclipseType type = EclipseType.typeOf(annotationNode, source);
         if (type.isAnnotation() || type.isInterface()) {
             annotationNode.addError(canBeUsedOnClassAndEnumOnly(ResourceResolverAware.class));
             return;
         }
 
-        JavacUtil.addInterface(type.node(), ResourceResolverAwareConstants.RESOURCE_RESOLVER_TYPE);
+        EclipseUtil.addInterface(type.get(), ResourceResolverAwareConstants.RESOURCE_RESOLVER_TYPE, source);
         handler.addResourceResolverSupport(type);
         type.editor().rebuild();
     }
 
-    private static class JavacResourceResolverAwareHandler extends ResourceResolverAwareHandler<JavacType> {
+    private static class EclipseResourceResolverAwareHandler extends ResourceResolverAwareHandler<EclipseType> {
     }
 }

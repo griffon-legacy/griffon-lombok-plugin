@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 the original author or authors.
+ * Copyright 2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,40 +14,38 @@
  * limitations under the License.
  */
 
-package lombok.javac.handlers;
+package lombok.eclipse.handlers;
 
-import com.sun.tools.javac.tree.JCTree;
 import griffon.transform.ThreadingAware;
 import lombok.core.AnnotationValues;
 import lombok.core.ThreadingAwareConstants;
 import lombok.core.handlers.ThreadingAwareHandler;
-import lombok.javac.JavacAnnotationHandler;
-import lombok.javac.JavacNode;
-import lombok.javac.handlers.ast.JavacType;
+import lombok.eclipse.EclipseAnnotationHandler;
+import lombok.eclipse.EclipseNode;
+import lombok.eclipse.handlers.ast.EclipseType;
+import org.eclipse.jdt.internal.compiler.ast.Annotation;
 
 import static lombok.core.util.ErrorMessages.canBeUsedOnClassAndEnumOnly;
-import static lombok.javac.handlers.JavacHandlerUtil.deleteAnnotationIfNeccessary;
 
 /**
  * @author Andres Almiray
  */
-public class HandleThreadingAware extends JavacAnnotationHandler<ThreadingAware> {
-    private final JavacThreadingAwareHandler handler = new JavacThreadingAwareHandler();
+public class HandleThreadingAware extends EclipseAnnotationHandler<ThreadingAware> {
+    private final EclipseThreadingAwareHandler handler = new EclipseThreadingAwareHandler();
 
-    public void handle(AnnotationValues<ThreadingAware> annotation, JCTree.JCAnnotation source, JavacNode annotationNode) {
-        deleteAnnotationIfNeccessary(annotationNode, ThreadingAware.class);
-
-        JavacType type = JavacType.typeOf(annotationNode, source);
+    @Override
+    public void handle(AnnotationValues<ThreadingAware> annotation, Annotation source, EclipseNode annotationNode) {
+        EclipseType type = EclipseType.typeOf(annotationNode, source);
         if (type.isAnnotation() || type.isInterface()) {
             annotationNode.addError(canBeUsedOnClassAndEnumOnly(ThreadingAware.class));
             return;
         }
 
-        JavacUtil.addInterface(type.node(), ThreadingAwareConstants.THREADING_HANDLER_TYPE);
+        EclipseUtil.addInterface(type.get(), ThreadingAwareConstants.THREADING_HANDLER_TYPE, source);
         handler.addThreadingHandlingSupport(type);
         type.editor().rebuild();
     }
 
-    private static class JavacThreadingAwareHandler extends ThreadingAwareHandler<JavacType> {
+    private static class EclipseThreadingAwareHandler extends ThreadingAwareHandler<EclipseType> {
     }
 }

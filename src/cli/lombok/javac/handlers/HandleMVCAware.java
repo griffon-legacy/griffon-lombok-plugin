@@ -26,8 +26,8 @@ import groovy.lang.Closure;
 import lombok.core.AnnotationValues;
 import lombok.javac.JavacAnnotationHandler;
 import lombok.javac.JavacNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -41,7 +41,7 @@ import static lombok.javac.handlers.JavacHandlerUtil.injectMethod;
  * @author Andres Almiray
  */
 public class HandleMVCAware extends JavacAnnotationHandler<MVCAware> {
-    private static final Logger LOG = LoggerFactory.getLogger(HandleMVCAware.class);
+    // private static final Logger LOG = LoggerFactory.getLogger(HandleMVCAware.class);
 
     private static final String CREATE_MVC_GROUP = "createMVCGroup";
     private static final String DESTROY_MVC_GROUP = "destroyMVCGroup";
@@ -454,7 +454,7 @@ public class HandleMVCAware extends JavacAnnotationHandler<MVCAware> {
             .withBody(bodyWithoutReturn(WITH_MVC_GROUP, args, b))
             .$(typeNode));
 
-        if (LOG.isDebugEnabled()) LOG.debug("Modified " + typeNode.getName() + " as MVCHandler.");
+        // if (LOG.isDebugEnabled()) LOG.debug("Modified " + typeNode.getName() + " as MVCHandler.");
     }
 
     private List<JCTree.JCStatement> body(String methodName, List<JCTree.JCExpression> args, HandlerUtils.TokenBuilder b) {

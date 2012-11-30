@@ -27,8 +27,8 @@ import lombok.core.AnnotationValues;
 import lombok.core.util.Naming;
 import lombok.javac.JavacAnnotationHandler;
 import lombok.javac.JavacNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -50,7 +50,7 @@ import static lombok.javac.handlers.MemberChecks.methodAlreadyExists;
  * @author Andres Almiray
  */
 public class HandleBindable extends JavacAnnotationHandler<Bindable> {
-    private static final Logger LOG = LoggerFactory.getLogger(HandleBindable.class);
+    // private static final Logger LOG = LoggerFactory.getLogger(HandleBindable.class);
     private static final String PROPERTY_SUPPORT_FIELD_NAME = "this$propertyChangeSupport";
     private static final String NAME_PARAM = "name";
     private static final String LISTENER_PARAM = "listener";
@@ -110,7 +110,7 @@ public class HandleBindable extends JavacAnnotationHandler<Bindable> {
             injectFirePropertyChangeMethod(typeNode);
         }
 
-        if (LOG.isDebugEnabled()) LOG.debug("Modified " + typeNode.getName() + " as a Bindable class.");
+        // if (LOG.isDebugEnabled()) LOG.debug("Modified " + typeNode.getName() + " as a Bindable class.");
     }
 
     private boolean isCandidateField(JavacNode node) {

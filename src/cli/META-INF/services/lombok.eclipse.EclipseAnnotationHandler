@@ -1,0 +1,5 @@
+lombok.eclipse.handlers.HandleEventPublisher
+lombok.eclipse.handlers.HandleMessageSourceAware
+lombok.eclipse.handlers.HandleResourcesAware
+lombok.eclipse.handlers.HandleResourceResolverAware
+lombok.eclipse.handlers.HandleThreadingAware

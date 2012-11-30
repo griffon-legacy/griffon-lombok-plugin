@@ -18,9 +18,9 @@
  */
 class LombokGriffonPlugin {
     // the plugin version
-    String version = '0.3'
+    String version = '0.4'
     // the version or versions of Griffon the plugin is designed for
-    String griffonVersion = '1.1.0 > *'
+    String griffonVersion = '1.2.0 > *'
     // the other plugins this plugin depends on
     Map dependsOn = [:]
     // resources that are included in plugin packaging
@@ -58,13 +58,13 @@ Usage
 The Lombok plugin supports the following transformations
 
  * `@Threading` - modifies the method body to execute its contents in the appropriate threading context.
- * `@ThreadingAware` - injects the `[griffon.core.ThreadingHandler][4]` interface
- * `@ResourcesAware` - injects the `[griffon.core.ResourceHandler][5]` interface
- * `@EventPublisher` - injects the `[griffon.core.EventPublisher][6]` interface
- * `@Bindable` - injects the `[griffon.core.Observable][7]` interface.
- * `@MVCAware` - injects the `[griffon.core.MVCHandler][8]` interface
- * `@MessageSourceAware` - injects the `[griffon.core.i18n.MessageSource][9]` interface
- * `@ResourceResolverAware` - injects the `[griffon.core.resources.ResourceResolver][10]` interface
+ * `@ThreadingAware` - injects the [griffon.core.ThreadingHandler][4] interface
+ * `@ResourcesAware` - injects the [griffon.core.ResourceHandler][5] interface
+ * `@EventPublisher` - injects the [griffon.core.EventPublisher][6] interface
+ * `@Bindable` - injects the [griffon.core.Observable][7] interface.
+ * `@MVCAware` - injects the [griffon.core.MVCHandler][8] interface
+ * `@MessageSourceAware` - injects the [griffon.core.i18n.MessageSource][9] interface
+ * `@ResourceResolverAware` - injects the [griffon.core.resources.ResourceResolver][10] interface
 
 In the case of `@Bindable` there are a couple of limitations at the moment that don't make it work exactly as its Groovy counterpart:
 
@@ -90,9 +90,9 @@ gets compiled into
 whereas this Java source
 
         package sample;
- 
+
         import org.codehaus.griffon.runtime.core.AbstractGriffonModel;
- 
+
         @groovy.beans.Bindable
         public class SampleModel extends AbstractGriffonModel {
             private String input;
@@ -117,6 +117,47 @@ gets compiled to
 
 Additional transformations provided by [lombok-pg][3] are also available by installing this plugin.
 
+Tool Support
+------------
+
+### JavaC
+
+Support for this compiler is provided out-of-the-box by the command line tools. There's no additional configuration required.
+
+### Eclipse
+
+Follow these steps to setup Lombok in Eclipse
+
+ 1. Make sure the project has the required files to be opened as an Eclipse Project. Simply call the following command
+
+         griffon integrate-with --eclipse
+
+ 2. Install the [eclipse-support][11] plugin and update the `.classpath` file
+
+         griffon install-plugin eclipse-support
+         griffon eclipse-update
+
+ 3. Open the project in Eclipse
+ 4. Locate the `lombok-x.y.z.jar` in the project libraries. Right click on it, run it as a Java application. Select
+ `lombok.core.Main` as the class to launch. Follow the on-screen instructions. Make a not of the install path as you'll
+ need it in the next step. Restart Eclipse.
+
+### NetBeans
+
+Follow the instructions found in [Annotation Processors Support in the NetBeans IDE, Part I: Using Project Lombok][12].
+You may need to specify `lombok.core.AnnotationProcessor` in the list of Annotation Processors.
+
+NetBeans should be able to provide code suggestions on Java classes annotated with `@griffon.plugins.wslite.WsliteAware`.
+
+### Intellij IDEA
+
+Follow these steps to setup Lombok in Intellij IDEA
+
+ 1. Download the latest stable release of [lombok-intellij-plugin][13] as a zip file.
+ 2. Open up the Preferences dialog in IntelliJ IDEA
+ 3. Go to the Plugins page. Click on the "Install plugin from disk..." button. Select the zip file you just downloaded.
+ 4. Restart IntelliJ IDEA
+
 [1]: http://projectlombok.org/
 [2]: http://groovy.codehaus.org/Compile-time+Metaprogramming+-+AST+Transformations
 [3]: https://github.com/peichhorn/lombok-pg
@@ -127,5 +168,8 @@ Additional transformations provided by [lombok-pg][3] are also available by inst
 [8]: http://griffon.codehaus.org/guide/latest/api/griffon/core/MVCHandler.html
 [9]: http://griffon.codehaus.org/guide/latest/api/griffon/core/i18n/MessageSource.html
 [10]: http://griffon.codehaus.org/guide/latest/api/griffon/core/resources/ResourceResolver.html
+[11]: /plugin/eclipse-support
+[12]: http://netbeans.org/kb/docs/java/annotations-lombok.html
+[13]: http://code.google.com/p/lombok-intellij-plugin
 '''
 }

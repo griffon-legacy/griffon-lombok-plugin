@@ -1,0 +1,5 @@
+lombok.intellij.processor.clazz.EventPublisherProcessor
+lombok.intellij.processor.clazz.MessageSourceAwareProcessor
+lombok.intellij.processor.clazz.ResourcesAwareProcessor
+lombok.intellij.processor.clazz.ResourceResolverAwareProcessor
+lombok.intellij.processor.clazz.ThreadingAwareProcessor

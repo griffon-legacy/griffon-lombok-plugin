@@ -14,41 +14,38 @@
  * limitations under the License.
  */
 
-package lombok.javac.handlers;
+package lombok.eclipse.handlers;
 
-import com.sun.tools.javac.tree.JCTree;
 import griffon.transform.ResourcesAware;
 import lombok.core.AnnotationValues;
 import lombok.core.ResourcesAwareConstants;
 import lombok.core.handlers.ResourcesAwareHandler;
-import lombok.javac.JavacAnnotationHandler;
-import lombok.javac.JavacNode;
-import lombok.javac.handlers.ast.JavacType;
+import lombok.eclipse.EclipseAnnotationHandler;
+import lombok.eclipse.EclipseNode;
+import lombok.eclipse.handlers.ast.EclipseType;
+import org.eclipse.jdt.internal.compiler.ast.Annotation;
 
 import static lombok.core.util.ErrorMessages.canBeUsedOnClassAndEnumOnly;
-import static lombok.javac.handlers.JavacHandlerUtil.deleteAnnotationIfNeccessary;
 
 /**
  * @author Andres Almiray
  */
-public class HandleResourcesAware extends JavacAnnotationHandler<ResourcesAware> {
-    private final JavacResourcesAwareHandler handler = new JavacResourcesAwareHandler();
+public class HandleResourcesAware extends EclipseAnnotationHandler<ResourcesAware> {
+    private final EclipseResourcesAwareHandler handler = new EclipseResourcesAwareHandler();
 
     @Override
-    public void handle(AnnotationValues<ResourcesAware> annotation, final JCTree.JCAnnotation source, final JavacNode annotationNode) {
-        deleteAnnotationIfNeccessary(annotationNode, ResourcesAware.class);
-
-        JavacType type = JavacType.typeOf(annotationNode, source);
+    public void handle(AnnotationValues<ResourcesAware> annotation, Annotation source, EclipseNode annotationNode) {
+        EclipseType type = EclipseType.typeOf(annotationNode, source);
         if (type.isAnnotation() || type.isInterface()) {
             annotationNode.addError(canBeUsedOnClassAndEnumOnly(ResourcesAware.class));
             return;
         }
 
-        JavacUtil.addInterface(type.node(), ResourcesAwareConstants.RESOURCE_HANDLER_TYPE);
+        EclipseUtil.addInterface(type.get(), ResourcesAwareConstants.RESOURCE_HANDLER_TYPE, source);
         handler.addResourceLocatorSupport(type);
         type.editor().rebuild();
     }
 
-    private static class JavacResourcesAwareHandler extends ResourcesAwareHandler<JavacType> {
+    private static class EclipseResourcesAwareHandler extends ResourcesAwareHandler<EclipseType> {
     }
 }

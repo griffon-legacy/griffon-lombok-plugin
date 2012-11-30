@@ -1,20 +1,37 @@
 griffon.project.dependency.resolution = {
     inherits "global"
-    log "warn" 
+    log "warn"
     repositories {
         griffonHome()
-        mavenRepo 'http://repository.sonatype.org/content/groups/public'
+        mavenCentral()
+        mavenLocal()
+        mavenRepo 'http://repository.jetbrains.com/releases'
     }
     dependencies {
-/*
-        String lombokVersion = '0.11.2'
-        build "org.projectlombok:lombok:$lombokVersion",
-              "com.github.peichhorn:lombok-pg:$lombokVersion"
-*/
-        build "org.projectlombok:lombok:0.11.4",
+        build "org.projectlombok:lombok:0.11.6",
               "com.github.peichhorn:lombok-pg:0.11.3"
+        build('org.eclipse.jdt:org.eclipse.jdt.core:3.6.0.v_A58') {
+            export = false
+        }
+        String lombokIdea = '0.5'
+        build("de.plushnikov.lombok-intellij-plugin:processor-api:$lombokIdea",
+            "de.plushnikov.lombok-intellij-plugin:processor-core:$lombokIdea",
+            "de.plushnikov.lombok-intellij-plugin:intellij-facade-factory:$lombokIdea",
+            "de.plushnikov.lombok-intellij-plugin:intellij-facade-api:$lombokIdea",
+            "de.plushnikov.lombok-intellij-plugin:intellij-facade-9:$lombokIdea",
+            "de.plushnikov.lombok-intellij-plugin:intellij-facade-10:$lombokIdea",
+            "de.plushnikov.lombok-intellij-plugin:intellij-facade-11:$lombokIdea") {
+            export = false
+            transitive = false
+        }
+        String ideaVersion = '11.1.4'
+        build("org.jetbrains.idea:idea-openapi:$ideaVersion",
+            "org.jetbrains.idea:extensions:$ideaVersion",
+            "org.jetbrains.idea:util:$ideaVersion",
+            "org.jetbrains.idea:annotations:$ideaVersion")
     }
 }
+
 
 griffon {
     doc {
