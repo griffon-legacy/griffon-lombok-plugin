@@ -5,7 +5,6 @@ griffon.project.dependency.resolution = {
         griffonHome()
         mavenCentral()
         mavenLocal()
-        mavenRepo 'http://repository.jetbrains.com/releases'
     }
     dependencies {
         build "org.projectlombok:lombok:0.11.6",
@@ -28,7 +27,9 @@ griffon.project.dependency.resolution = {
         build("org.jetbrains.idea:idea-openapi:$ideaVersion",
             "org.jetbrains.idea:extensions:$ideaVersion",
             "org.jetbrains.idea:util:$ideaVersion",
-            "org.jetbrains.idea:annotations:$ideaVersion")
+            "org.jetbrains.idea:annotations:$ideaVersion") {
+            export = false
+        }
     }
 }
 

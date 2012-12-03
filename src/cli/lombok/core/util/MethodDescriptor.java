@@ -28,7 +28,7 @@ public class MethodDescriptor {
         public final String type;
         public final Type[] parameters;
         public final int dimensions;
-        public final String signature;
+        public String signature;
 
         public Type(String type) {
             this(type, 0, EMPTY_TYPES);
@@ -46,7 +46,13 @@ public class MethodDescriptor {
             this.type = type;
             this.dimensions = dimensions;
             this.parameters = parameters != null ? parameters : EMPTY_TYPES;
-            this.signature = createTypeSignature();
+        }
+
+        public String signature() {
+            if(signature == null) {
+                signature = createTypeSignature();
+            }
+            return signature;
         }
 
         protected String createTypeSignature() {
@@ -54,7 +60,7 @@ public class MethodDescriptor {
             if (parameters.length > 0) {
                 b.append("<");
                 for (int i = 0; i < parameters.length; i++) {
-                    b.append(parameters[i].signature);
+                    b.append(parameters[i].signature());
                     if (i < parameters.length - 1) b.append(", ");
                 }
                 b.append(">");
@@ -99,7 +105,7 @@ public class MethodDescriptor {
             if (parameters.length > 0) {
                 b.append(" ").append(bound).append(" ");
                 for (int i = 0; i < parameters.length; i++) {
-                    b.append(parameters[i].signature);
+                    b.append(parameters[i].signature());
                     if (i < parameters.length - 1) b.append(", ");
                 }
             }
@@ -129,7 +135,7 @@ public class MethodDescriptor {
         private String createTypeParamSignature() {
             StringBuilder b = new StringBuilder(type);
             if (bound != NO_BOUND) {
-                b.append(" extends ").append(bound.signature);
+                b.append(" extends ").append(bound.signature());
             }
             return b.toString();
         }
@@ -161,13 +167,13 @@ public class MethodDescriptor {
             }
             b.append("> ");
         }
-        b.append(returnType.signature)
+        b.append(returnType.signature())
             .append(" ")
             .append(methodName)
             .append("(");
         if (arguments.length > 0) {
             for (int i = 0; i < arguments.length; i++) {
-                b.append(arguments[i].signature)
+                b.append(arguments[i].signature())
                     .append(" arg")
                     .append(i);
                 if (i < arguments.length - 1) b.append(", ");
@@ -177,7 +183,7 @@ public class MethodDescriptor {
         if (exceptions.length > 0) {
             b.append(" throws ");
             for (int i = 0; i < exceptions.length; i++) {
-                b.append(exceptions[i].signature);
+                b.append(exceptions[i].signature());
                 if (i < exceptions.length - 1) b.append(", ");
             }
         }

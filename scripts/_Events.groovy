@@ -25,7 +25,6 @@ eventPost_package_pluginEnd = {
         ant.unjar(dest: tmpdir, src: "${griffonHome}/dist/griffon-cli-${griffonVersion}.jar", overwrite: true) {
             patternset {
                 include(name: "griffon/transform/**")
-                include(name: "org/codehaus/griffon/ast/AbstractASTTransformation.class")
             }
         }
         ant.unjar(dest: tmpdir, src: "${griffonHome}/lib/groovy-all-${griffonSettings.groovyVersion}.jar", overwrite: true) {
