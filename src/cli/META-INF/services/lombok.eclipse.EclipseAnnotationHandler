@@ -1,6 +1,8 @@
+lombok.eclipse.handlers.HandleBindable
 lombok.eclipse.handlers.HandleEventPublisher
 lombok.eclipse.handlers.HandleMessageSourceAware
 lombok.eclipse.handlers.HandleMVCAware
 lombok.eclipse.handlers.HandleResourceResolverAware
 lombok.eclipse.handlers.HandleResourcesAware
 lombok.eclipse.handlers.HandleThreadingAware
+lombok.eclipse.handlers.HandleVetoable

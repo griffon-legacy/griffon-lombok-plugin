@@ -154,7 +154,7 @@ Follow these steps to setup Lombok in Eclipse
     launch. Follow the on-screen instructions. Make a not of the install path
     as you'll need it in the next step. Shutdown Eclipse.
  5. Go to the path where the `lombok.jar` was copied. This path is either found
-    inside the Eclipse insatllation directory or in your local settings. Copy
+    inside the Eclipse installation directory or in your local settings. Copy
     the following files from the project's working directory
 
          $ cp $USER_HOME/.griffon/<version>/projects/<project>/plugins/lombok-<version>/dist/griffon-lombok-compile-<version>.jar .

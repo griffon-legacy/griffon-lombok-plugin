@@ -20,10 +20,8 @@ import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
-import de.plushnikov.intellij.lombok.util.PsiMethodUtil;
 import griffon.transform.MVCAware;
 import lombok.core.MVCAwareConstants;
-import lombok.core.util.MethodDescriptor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -37,8 +35,6 @@ public class MVCAwareProcessor extends AbstractGriffonLombokClassProcessor imple
     }
 
     protected <Psi extends PsiElement> void processIntern(@NotNull PsiClass psiClass, @NotNull PsiAnnotation psiAnnotation, @NotNull List<Psi> target) {
-        for (MethodDescriptor methodDesc : METHODS) {
-            target.add((Psi) PsiMethodUtil.createMethod(psiClass, methodDesc.signature, psiAnnotation));
-        }
+        delegateTo(psiClass, psiAnnotation, target, METHODS);
     }
 }

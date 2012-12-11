@@ -24,10 +24,10 @@ import com.sun.tools.javac.code.Type.MethodType;
 import com.sun.tools.javac.model.JavacElements;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCAnnotation;
-import groovy.beans.Bindable;
+import groovy.beans.Vetoable;
 import lombok.ast.TypeRef;
 import lombok.core.AnnotationValues;
-import lombok.core.handlers.BindableHandler;
+import lombok.core.handlers.VetoableHandler;
 import lombok.core.util.As;
 import lombok.javac.JavacAnnotationHandler;
 import lombok.javac.JavacNode;
@@ -45,10 +45,10 @@ import java.util.List;
  *
  * @author Andres Almiray
  */
-public class HandleBindable extends JavacAnnotationHandler<Bindable> {
+public class HandleVetoable extends JavacAnnotationHandler<Vetoable> {
     @Override
-    public void handle(AnnotationValues<Bindable> annotation, JCAnnotation source, JavacNode annotationNode) {
-        new BindableHandler<JavacType, JavacField, JavacNode, JCTree>(annotationNode, source) {
+    public void handle(AnnotationValues<Vetoable> annotation, JCAnnotation source, JavacNode annotationNode) {
+        new VetoableHandler<JavacType, JavacField, JavacNode, JCTree>(annotationNode, source) {
             @Override
             protected void addInterface(JavacType type, String interfaceClassName) {
                 JavacUtil.addInterface(type.node(), interfaceClassName);
@@ -73,31 +73,16 @@ public class HandleBindable extends JavacAnnotationHandler<Bindable> {
             protected boolean isAnnotatedWith(final JavacType type, final Class<? extends Annotation> annotationClass) {
                 final Symbol.TypeSymbol typeSymbol = type.get().sym;
                 if (typeSymbol == null) return false;
-                return isAnnotatedWith0(typeSymbol, annotationClass);
+                Type supertype = ((ClassSymbol) typeSymbol).getSuperclass();
+                return isAnnotatedWith(supertype.tsym, annotationClass);
             }
 
             @Override
             protected boolean isAnnotatedWith(final JavacNode javacNode, final Class<? extends Annotation> annotationClass) {
-                final JCTree jcTree = javacNode.get();
-                if (jcTree == null) return false;
-                final Type symType = jcTree.type;
-                if (symType == null) return false;
-                final Symbol.TypeSymbol typeSymbol = symType.tsym;
+                final Symbol.TypeSymbol typeSymbol = javacNode.get().type.tsym;
                 if (typeSymbol == null) return false;
-                return isAnnotatedWith0(typeSymbol, annotationClass);
-            }
-
-            private boolean isAnnotatedWith0(final Symbol.TypeSymbol type, final Class<? extends Annotation> annotationClass) {
-                if (type == null) return false;
-                if (isAnnotatedWith(type, annotationClass)) return true;
-                for (Symbol enclosedElement : type.getEnclosedElements()) {
-                    if (enclosedElement instanceof Symbol.VarSymbol) {
-                        final Symbol.VarSymbol var = (Symbol.VarSymbol) enclosedElement;
-                        if (isAnnotatedWith(var, annotationClass)) return true;
-                    }
-                }
-                Type supertype = ((ClassSymbol) type).getSuperclass();
-                return isAnnotatedWith0(supertype.tsym, annotationClass);
+                Type supertype = ((ClassSymbol) typeSymbol).getSuperclass();
+                return isAnnotatedWith(supertype.tsym, annotationClass);
             }
 
             private boolean isAnnotatedWith(final Symbol type, final Class<? extends Annotation> annotationClass) {

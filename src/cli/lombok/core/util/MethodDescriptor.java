@@ -16,6 +16,8 @@
 
 package lombok.core.util;
 
+import java.lang.reflect.Modifier;
+
 /**
  * @author Andres Almiray
  */
@@ -141,6 +143,7 @@ public class MethodDescriptor {
         }
     }
 
+    public final int modifiers;
     public final String methodName;
     public final Type returnType;
     public final TypeParam[] typeParameters;
@@ -149,6 +152,11 @@ public class MethodDescriptor {
     public final String signature;
 
     public MethodDescriptor(Type returnType, TypeParam[] typeParameters, String methodName, Type[] arguments, Type[] exceptions) {
+        this(Modifier.PUBLIC, returnType, typeParameters, methodName, arguments, exceptions);
+    }
+
+    public MethodDescriptor(int modifiers, Type returnType, TypeParam[] typeParameters, String methodName, Type[] arguments, Type[] exceptions) {
+        this.modifiers = modifiers;
         this.returnType = returnType;
         this.methodName = methodName;
         this.typeParameters = typeParameters != null ? typeParameters : EMPTY_PARAMETERS;
@@ -158,7 +166,7 @@ public class MethodDescriptor {
     }
 
     private String createMethodSignature() {
-        StringBuilder b = new StringBuilder();
+        StringBuilder b = new StringBuilder(Modifier.toString(modifiers)).append(" ");
         if (typeParameters.length > 0) {
             b.append("<");
             for (int i = 0; i < typeParameters.length; i++) {
@@ -276,5 +284,29 @@ public class MethodDescriptor {
 
     public static MethodDescriptor method(Type type, String methodName, Type[] args, Type[] exceptions) {
         return new MethodDescriptor(type, EMPTY_PARAMETERS, methodName, args, exceptions);
+    }
+
+    public static MethodDescriptor method(int modifiers, Type type, TypeParam[] typeParameters, String methodName, Type[] args) {
+        return new MethodDescriptor(modifiers, type, typeParameters, methodName, args, EMPTY_TYPES);
+    }
+
+    public static MethodDescriptor method(int modifiers, Type type, TypeParam[] typeParameters, String methodName) {
+        return new MethodDescriptor(modifiers, type, typeParameters, methodName, EMPTY_TYPES, EMPTY_TYPES);
+    }
+
+    public static MethodDescriptor method(int modifiers, Type type, String methodName, Type[] args) {
+        return new MethodDescriptor(modifiers, type, EMPTY_PARAMETERS, methodName, args, EMPTY_TYPES);
+    }
+
+    public static MethodDescriptor method(int modifiers, Type type, String methodName) {
+        return new MethodDescriptor(modifiers, type, EMPTY_PARAMETERS, methodName, EMPTY_TYPES, EMPTY_TYPES);
+    }
+
+    public static MethodDescriptor method(int modifiers, Type type, TypeParam[] typeParameters, String methodName, Type[] args, Type[] exceptions) {
+        return new MethodDescriptor(modifiers, type, typeParameters, methodName, args, exceptions);
+    }
+
+    public static MethodDescriptor method(int modifiers, Type type, String methodName, Type[] args, Type[] exceptions) {
+        return new MethodDescriptor(modifiers, type, EMPTY_PARAMETERS, methodName, args, exceptions);
     }
 }

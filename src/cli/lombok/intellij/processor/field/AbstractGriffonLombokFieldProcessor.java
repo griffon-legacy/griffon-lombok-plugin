@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package lombok.intellij.processor.clazz;
+package lombok.intellij.processor.field;
 
-import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
-import de.plushnikov.intellij.lombok.ErrorMessages;
 import de.plushnikov.intellij.lombok.problem.ProblemBuilder;
-import de.plushnikov.intellij.lombok.processor.clazz.AbstractLombokClassProcessor;
+import de.plushnikov.intellij.lombok.processor.field.AbstractLombokFieldProcessor;
+import de.plushnikov.intellij.lombok.quickfix.PsiQuickFixFactory;
 import de.plushnikov.intellij.lombok.util.PsiClassUtil;
 import de.plushnikov.intellij.lombok.util.PsiMethodUtil;
 import lombok.core.util.MethodDescriptor;
@@ -33,10 +32,10 @@ import java.util.Locale;
 /**
  * @author Andres Almiray
  */
-public abstract class AbstractGriffonLombokClassProcessor extends AbstractLombokClassProcessor {
+public abstract class AbstractGriffonLombokFieldProcessor extends AbstractLombokFieldProcessor {
     private final Class<? extends Annotation> annotationClass;
 
-    public AbstractGriffonLombokClassProcessor(@NotNull Class<? extends Annotation> annotationClass, @NotNull Class<?> psiClass) {
+    protected AbstractGriffonLombokFieldProcessor(@NotNull Class<? extends Annotation> annotationClass, @NotNull Class<?> psiClass) {
         super(annotationClass, psiClass);
         this.annotationClass = annotationClass;
     }
@@ -46,40 +45,38 @@ public abstract class AbstractGriffonLombokClassProcessor extends AbstractLombok
     }
 
     @Override
-    protected boolean validate(@NotNull PsiAnnotation psiAnnotation, @NotNull PsiClass psiClass, @NotNull ProblemBuilder builder) {
-        return validateAnnotationOnRigthType(psiClass, builder);
+    protected boolean validate(@NotNull PsiAnnotation psiAnnotation, @NotNull PsiField psiField, @NotNull ProblemBuilder builder) {
+        return validateFinalModifier(psiAnnotation, psiField, builder);
     }
 
-    protected boolean validateAnnotationOnRigthType(@NotNull PsiClass psiClass, @NotNull ProblemBuilder builder) {
+    protected boolean validateFinalModifier(@NotNull PsiAnnotation psiAnnotation, @NotNull PsiField psiField, @NotNull ProblemBuilder builder) {
         boolean result = true;
-        if (psiClass.isAnnotationType() || psiClass.isInterface() || psiClass.isEnum()) {
-            builder.addError(ErrorMessages.canBeUsedOnClassOnly(getAnnotationClass()));
+        if (psiField.hasModifierProperty(PsiModifier.FINAL)) {
+            builder.addError(String.format("'@%s' on final field is not allowed", psiAnnotation.getQualifiedName()),
+                PsiQuickFixFactory.createModifierListFix(psiField, PsiModifier.FINAL, false, false));
             result = false;
         }
         return result;
     }
 
-    public PsiElementFactory psiElementFactory(@NotNull PsiClass psiClass) {
-        Project project = psiClass.getProject();
-        return JavaPsiFacade.getElementFactory(project);
-    }
-
-    protected <Psi extends PsiElement> void delegateTo(@NotNull PsiClass psiClass, @NotNull PsiAnnotation psiAnnotation, @NotNull List<Psi> target, @NotNull MethodDescriptor[] methods) {
+    protected <Psi extends PsiElement> void delegateTo(@NotNull PsiField psiField, @NotNull PsiAnnotation psiAnnotation, @NotNull List<Psi> target, @NotNull MethodDescriptor[] methods) {
+        PsiClass psiClass = psiField.getContainingClass();
         for (MethodDescriptor methodDesc : methods) {
             PsiMethod method = PsiMethodUtil.createMethod(psiClass, methodDesc.signature, psiAnnotation);
-            safeAddMethod(psiClass, method, target);
+            safeAddMethod(psiField, method, target);
         }
     }
 
-    protected <Psi extends PsiElement> void safeAddMethod(@NotNull PsiClass psiClass, @NotNull String method, @NotNull List<Psi> target) {
-        safeAddMethod(psiClass,
+    protected <Psi extends PsiElement> void safeAddMethod(@NotNull PsiField psiField, @NotNull String method, @NotNull List<Psi> target) {
+        PsiClass psiClass = psiField.getContainingClass();
+        safeAddMethod(psiField,
             PsiMethodUtil.createMethod(psiClass, method, psiClass),
             target);
     }
 
-    protected <Psi extends PsiElement> void safeAddMethod(@NotNull PsiClass psiClass, @NotNull PsiMethod targetMethod, @NotNull List<Psi> target) {
+    protected <Psi extends PsiElement> void safeAddMethod(@NotNull PsiField psiField, @NotNull PsiMethod targetMethod, @NotNull List<Psi> target) {
+        PsiClass psiClass = psiField.getContainingClass();
         final PsiMethod[] classMethods = PsiClassUtil.collectClassMethodsIntern(psiClass);
-
         boolean found = false;
         for (PsiMethod method : classMethods) {
             if (method.getName().equals(targetMethod.getName()) &&

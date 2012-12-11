@@ -1,6 +1,10 @@
+lombok.intellij.processor.clazz.BindableProcessor
 lombok.intellij.processor.clazz.EventPublisherProcessor
 lombok.intellij.processor.clazz.MessageSourceAwareProcessor
 lombok.intellij.processor.clazz.MVCAwareProcessor
 lombok.intellij.processor.clazz.ResourcesAwareProcessor
 lombok.intellij.processor.clazz.ResourceResolverAwareProcessor
 lombok.intellij.processor.clazz.ThreadingAwareProcessor
+lombok.intellij.processor.clazz.VetoableProcessor
+lombok.intellij.processor.field.BindableProcessor
+lombok.intellij.processor.field.VetoableProcessor

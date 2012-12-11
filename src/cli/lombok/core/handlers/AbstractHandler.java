@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import static lombok.ast.AST.*;
+import static lombok.core.util.Names.capitalize;
 
 /**
  * @author Andres Almiray
@@ -67,26 +68,40 @@ public abstract class AbstractHandler<TYPE_TYPE extends IType<? extends IMethod<
         return Call(Name("griffon.util.ApplicationHolder"), "getApplication");
     }
 
-    public void addField(final TYPE_TYPE type, String fieldType, String fieldName) {
-        addField(type, fieldType, fieldName, null);
+    public FieldDecl addField(final TYPE_TYPE type, String fieldType, String fieldName) {
+        return addField(type, fieldType, fieldName, null);
     }
 
-    public void addField(final TYPE_TYPE type, String fieldType, String fieldName, Expression<?> initialization) {
+    public FieldDecl addField(final TYPE_TYPE type, String fieldType, String fieldName, Expression<?> initialization) {
         final FieldDecl fieldDecl = FieldDecl(Type(fieldType), fieldName)
             .makePrivate();
         if (initialization != null) fieldDecl.withInitialization(initialization);
         type.editor().injectField(fieldDecl);
+        return fieldDecl;
     }
 
-    public void addField(final TYPE_TYPE type, MethodDescriptor.Type fieldType, String fieldName) {
-        addField(type, fieldType, fieldName, null);
+    public FieldDecl addField(final TYPE_TYPE type, MethodDescriptor.Type fieldType, String fieldName) {
+        return addField(type, fieldType, fieldName, null);
     }
 
-    public void addField(final TYPE_TYPE type, MethodDescriptor.Type fieldType, String fieldName, Expression<?> initialization) {
+    public FieldDecl addField(final TYPE_TYPE type, MethodDescriptor.Type fieldType, String fieldName, Expression<?> initialization) {
         final FieldDecl fieldDecl = FieldDecl(asTypeRef(fieldType), fieldName)
             .makePrivate();
         if (initialization != null) fieldDecl.withInitialization(initialization);
         type.editor().injectField(fieldDecl);
+        return fieldDecl;
+    }
+
+    public FieldDecl addField(final TYPE_TYPE type, TypeRef fieldType, String fieldName) {
+        return addField(type, fieldType, fieldName, null);
+    }
+
+    public FieldDecl addField(final TYPE_TYPE type, TypeRef fieldType, String fieldName, Expression<?> initialization) {
+        final FieldDecl fieldDecl = FieldDecl(fieldType, fieldName)
+            .makePrivate();
+        if (initialization != null) fieldDecl.withInitialization(initialization);
+        type.editor().injectField(fieldDecl);
+        return fieldDecl;
     }
 
     public void delegateMethodsTo(TYPE_TYPE type, MethodDescriptor[] methodDescriptors, Expression<?> receiver) {
@@ -134,5 +149,13 @@ public abstract class AbstractHandler<TYPE_TYPE extends IType<? extends IMethod<
 
             type.editor().injectMethod(methodDecl);
         }
+    }
+
+    public static String getGetterName(String propertyName) {
+        return "get" + capitalize(propertyName);
+    }
+
+    public static String getSetterName(String propertyName) {
+        return "set" + capitalize(propertyName);
     }
 }
