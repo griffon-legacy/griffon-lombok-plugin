@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012 the original author or authors.
+ * Copyright 2011-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -177,7 +177,7 @@ IDE, Part I: Using Project Lombok][12]. You may need to specify
 
 Follow these steps to setup Lombok in Intellij IDEA
 
- 1. Download the latest stable release of [lombok-intellij-plugin][7] as a
+ 1. Download the latest stable release of [lombok-intellij-plugin][13] as a
     zip file.
  2. Open up the Preferences dialog in IntelliJ IDEA
  3. Go to the Plugins page. Click on the "Install plugin from disk..." button.
