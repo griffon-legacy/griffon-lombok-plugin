@@ -51,7 +51,7 @@ class LombokGriffonPlugin {
 Allows bytecode manipulation at compile time using [Project Lombok][1]. Think
 of Lombok as [AST transformations][2] for Java sources.
 
-**Works with Javac only. Eclipse compiler support is forthcoming.**
+**Supports Javac and Eclipse JDT. Works with Intellij IDEA, Eclipse and NetBeans.**
 
 Usage
 -----
@@ -59,69 +59,22 @@ Usage
 The Lombok plugin supports the following transformations
 
  * `@Threading` - modifies the method body to execute its contents in the
-   appropriate threading context.
- * `@ThreadingAware` - injects the [griffon.core.ThreadingHandler][4] interface
- * `@ResourcesAware` - injects the [griffon.core.ResourceHandler][5] interface
- * `@EventPublisher` - injects the [griffon.core.EventPublisher][6] interface
- * `@Bindable` - injects the [griffon.core.Observable][7] interface.
- * `@MVCAware` - injects the [griffon.core.MVCHandler][8] interface
- * `@MessageSourceAware` - injects the [griffon.core.i18n.MessageSource][9]
-   interface
- * `@ResourceResolverAware` - injects the [griffon.core.resources.ResourceResolver][10]
+   appropriate threading context **Javac only**
+ * `@ThreadingAware` - injects the `griffon.core.ThreadingHandler` interface
+ * `@ResourcesAware` - injects the `griffon.core.ResourceHandler` interface
+ * `@EventPublisher` - injects the `griffon.core.EventPublisher` interface
+ * `@Bindable` - injects the `griffon.core.Observable` interface
+ * `@Vetoable` - injects the `griffon.core.Vetoable` interface
+ * `@MVCAware` - injects the `griffon.core.MVCHandler` interface
+ * `@MessageSourceAware` - injects the `griffon.core.i18n.MessageSource` interface
+ * `@ResourceResolverAware` - injects the `griffon.core.resources.ResourceResolver`
    interface
 
-In the case of `@Bindable` there are a couple of limitations at the moment that
-don't make it work exactly as its Groovy counterpart:
+In the case of `@Bindable` and `@Vetoable` there are a couple of limitations at
+the moment that don't make it work exactly as its Groovy counterpart:
 
- * inheritance is not honored. That is, if the super class is already `Observable`
-   this annotation will still inject the required methods.
- * the superclass will be set to `AbstractObservable` if the annotated class
-   has no extends clause.
  * Java has no concept of properties like Groovy does, `@Bindable` expects all
    private fields to be properties.
-
-These rules means that the following Java code
-
-    @groovy.beans.Bindable
-    public class Bean {
-        private String input;
-    }
-
-gets compiled into
-
-    public class Bean extends org.codehaus.griffon.runtime.core.AbstractObservable {
-        public Bean();
-        public void setInput(java.lang.String);
-        public java.lang.String getInput();
-    }
-
-whereas this Java source
-
-    package sample;
-
-    import org.codehaus.griffon.runtime.core.AbstractGriffonModel;
-
-    @groovy.beans.Bindable
-    public class SampleModel extends AbstractGriffonModel {
-        private String input;
-    }
-
-gets compiled to
-
-    public class sample.SampleModel 
-            extends org.codehaus.griffon.runtime.core.AbstractGriffonModel 
-            implements griffon.core.Observable {
-        public sample.SampleModel();
-        public void addPropertyChangeListener(java.beans.PropertyChangeListener);
-        public void addPropertyChangeListener(java.lang.String, java.beans.PropertyChangeListener);
-        public void removePropertyChangeListener(java.beans.PropertyChangeListener);
-        public void removePropertyChangeListener(java.lang.String, java.beans.PropertyChangeListener);
-        public java.beans.PropertyChangeListener[] getPropertyChangeListeners();
-        public java.beans.PropertyChangeListener[] getPropertyChangeListeners(java.lang.String);
-        protected void firePropertyChange(java.lang.String, java.lang.Object, java.lang.Object);
-        public void setInput(java.lang.String);
-        public java.lang.String getInput();
-    }
 
 Additional transformations provided by [lombok-pg][3] are also available by
 installing this plugin.
@@ -143,7 +96,7 @@ Follow these steps to setup Lombok in Eclipse
 
          griffon integrate-with --eclipse
 
- 2. Install the [eclipse-support][11] plugin and update the `.classpath` file
+ 2. Install the [eclipse-support][4] plugin and update the `.classpath` file
 
          griffon install-plugin eclipse-support
          griffon eclipse-update
@@ -170,14 +123,14 @@ Follow these steps to setup Lombok in Eclipse
 ### NetBeans
 
 Follow the instructions found in [Annotation Processors Support in the NetBeans
-IDE, Part I: Using Project Lombok][12]. You may need to specify
+IDE, Part I: Using Project Lombok][5]. You may need to specify
 `lombok.core.AnnotationProcessor` in the list of Annotation Processors.
 
 ### Intellij IDEA
 
 Follow these steps to setup Lombok in Intellij IDEA
 
- 1. Download the latest stable release of [lombok-intellij-plugin][13] as a
+ 1. Download the latest stable release of [lombok-intellij-plugin][6] as a
     zip file.
  2. Open up the Preferences dialog in IntelliJ IDEA
  3. Go to the Plugins page. Click on the "Install plugin from disk..." button.
@@ -198,15 +151,8 @@ Follow these steps to setup Lombok in Intellij IDEA
 [1]: http://projectlombok.org/
 [2]: http://groovy.codehaus.org/Compile-time+Metaprogramming+-+AST+Transformations
 [3]: https://github.com/peichhorn/lombok-pg
-[4]: http://griffon.codehaus.org/guide/latest/api/griffon/core/ThreadingHandler.html
-[5]: http://griffon.codehaus.org/guide/latest/api/griffon/core/ResourceHandler.html
-[6]: http://griffon.codehaus.org/guide/latest/api/griffon/core/EventPublisher.html
-[7]: http://griffon.codehaus.org/guide/latest/api/griffon/core/Observable.html
-[8]: http://griffon.codehaus.org/guide/latest/api/griffon/core/MVCHandler.html
-[9]: http://griffon.codehaus.org/guide/latest/api/griffon/core/i18n/MessageSource.html
-[10]: http://griffon.codehaus.org/guide/latest/api/griffon/core/resources/ResourceResolver.html
-[11]: /plugin/eclipse-support
-[12]: http://netbeans.org/kb/docs/java/annotations-lombok.html
-[13]: http://code.google.com/p/lombok-intellij-plugin
+[4]: /plugin/eclipse-support
+[5]: http://netbeans.org/kb/docs/java/annotations-lombok.html
+[6]: http://code.google.com/p/lombok-intellij-plugin
 '''
 }
