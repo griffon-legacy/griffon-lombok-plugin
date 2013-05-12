@@ -7,7 +7,7 @@
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by getApplication()licable law or agreed to in writing, software
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
@@ -18,9 +18,9 @@
  */
 class LombokGriffonPlugin {
     // the plugin version
-    String version = '0.4'
+    String version = '0.5.0'
     // the version or versions of Griffon the plugin is designed for
-    String griffonVersion = '1.2.0 > *'
+    String griffonVersion = '1.3.0 > *'
     // the other plugins this plugin depends on
     Map dependsOn = [:]
     // resources that are included in plugin packaging
@@ -58,8 +58,6 @@ Usage
 
 The Lombok plugin supports the following transformations
 
- * `@Threading` - modifies the method body to execute its contents in the
-   appropriate threading context **Javac only**
  * `@ThreadingAware` - injects the `griffon.core.ThreadingHandler` interface
  * `@ResourcesAware` - injects the `griffon.core.ResourceHandler` interface
  * `@EventPublisher` - injects the `griffon.core.EventPublisher` interface

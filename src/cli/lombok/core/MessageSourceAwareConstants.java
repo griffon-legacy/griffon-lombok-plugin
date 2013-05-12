@@ -28,8 +28,16 @@ public interface MessageSourceAwareConstants extends BaseConstants {
     String MESSAGE_SOURCE_TYPE = "griffon.core.i18n.MessageSource";
     String JAVA_UTIL_LOCALE = "java.util.Locale";
     String METHOD_GET_MESSAGE = "getMessage";
+    String METHOD_RESOLVE_MESSAGE_VALUE = "resolveMessageValue";
+    String METHOD_FORMAT_MESSAGE = "formatMessage";
 
     MethodDescriptor[] METHODS = new MethodDescriptor[]{
+        MethodDescriptor.method(
+            type(JAVA_LANG_STRING),
+            METHOD_RESOLVE_MESSAGE_VALUE,
+            args(type(JAVA_LANG_STRING), type(JAVA_UTIL_LOCALE)),
+            throwing(type(NO_SUCH_MESSAGE_EXCEPTION_TYPE))
+        ),
         MethodDescriptor.method(
             type(JAVA_LANG_STRING),
             METHOD_GET_MESSAGE,
@@ -121,6 +129,27 @@ public interface MessageSourceAwareConstants extends BaseConstants {
                 type(JAVA_UTIL_MAP, JAVA_LANG_STRING, JAVA_LANG_OBJECT),
                 type(JAVA_LANG_STRING),
                 type(JAVA_UTIL_LOCALE))
+        ),
+        MethodDescriptor.method(
+            type(JAVA_LANG_STRING),
+            METHOD_FORMAT_MESSAGE,
+            args(
+                type(JAVA_LANG_OBJECT, 1),
+                type(JAVA_UTIL_MAP))
+        ),
+        MethodDescriptor.method(
+            type(JAVA_LANG_STRING),
+            METHOD_FORMAT_MESSAGE,
+            args(
+                type(JAVA_LANG_STRING),
+                type(JAVA_UTIL_LIST))
+        ),
+        MethodDescriptor.method(
+            type(JAVA_LANG_STRING),
+            METHOD_FORMAT_MESSAGE,
+            args(
+                type(JAVA_LANG_STRING),
+                type(JAVA_UTIL_MAP))
         )
     };
 }
